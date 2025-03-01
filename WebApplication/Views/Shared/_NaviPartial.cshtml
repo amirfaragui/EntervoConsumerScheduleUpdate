@@ -1,0 +1,85 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using T2Importer.Identity
+@inject SignInManager<CustomerPortalUser> SignInManager
+@inject UserManager<CustomerPortalUser> UserManager
+
+@{
+  var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+  //var user = await UserManager.GetUserAsync(User);
+  var isAdmin = true; //  await UserManager.IsInRoleAsync(user, "Administrators");
+  var isManager = true; // await UserManager.IsInRoleAsync(user, "Managers");
+}
+
+
+<kendo-panelbar name="menu" expand-mode="single">
+  <items>
+    <panelbar-item text="Dashboard" href="/dashboard" selected=@NavPages.IsDashboardSelected(ViewContext)></panelbar-item>
+
+    <panelbar-item text="Customers" expanded=@NavPages.IsCustomersExpanded(ViewContext)>
+      <items>
+        <panelbar-item text="List" href="/customers/index" selected=@NavPages.IsCustomerListSelected(ViewContext)></panelbar-item>
+        <panelbar-item text="Details" href="/customers/edit" selected=@NavPages.IsCustomerEditSelected(ViewContext)></panelbar-item>
+      </items>
+    </panelbar-item>
+
+    <panelbar-item text="Permits" expanded=@NavPages.IsPermitsExpanded(ViewContext)>
+      <items>
+        <panelbar-item text="List" href="/permits/index" selected=@NavPages.IsPermitListSelected(ViewContext)></panelbar-item>
+        <panelbar-item text="Details" href="/customers/edit" selected=@NavPages.IsPermitEditSelected(ViewContext)></panelbar-item>
+      </items>
+    </panelbar-item>
+
+    <panelbar-item text="Consumers" expanded=@NavPages.IsConsumersExpanded(ViewContext)>
+      <items>
+        <panelbar-item text="Search" href="/consumers" selected=@NavPages.IsConsumersSelected(ViewContext)></panelbar-item>
+        <panelbar-item text="Upload" href="/upload" selected=@NavPages.IsUploadSelected(ViewContext)></panelbar-item>
+      </items>
+    </panelbar-item>
+
+    <panelbar-item text="Import Data" expanded=@NavPages.IsImportExpanded(ViewContext)>
+      <items>
+        <panelbar-item text="Customers" href="/customers/import" selected=@NavPages.IsCustomersImportSelected(ViewContext)></panelbar-item>
+        <panelbar-item text="Permits" href="/permits/import" selected=@NavPages.IsPermitsImportSelected(ViewContext)></panelbar-item>
+        <panelbar-item text="Emails" href="/emails/import" selected=@NavPages.IsEmailsImportSelected(ViewContext)></panelbar-item>
+        <panelbar-item text="Notes" href="/notes/import" selected=@NavPages.IsNotesImportSelected(ViewContext)></panelbar-item>
+      </items>
+    </panelbar-item>
+
+    <panelbar-item text="History" href="/history" selected=@NavPages.IsHistorySelected(ViewContext)></panelbar-item>
+
+
+    @if (isAdmin)
+    {
+      <panelbar-item text="Settings" expanded=@NavPages.IsSettingsExpanded(ViewContext)>
+        <items>
+          <panelbar-item text="Source" href="/FtpSource" selected=@NavPages.IsFtpSourceSelected(ViewContext)></panelbar-item>
+          <panelbar-item text="Destination" href="/Destination" selected=@NavPages.IsApiEndpointSelected(ViewContext)></panelbar-item>
+@*           <panelbar-item text="Users" href="/Users" selected=@NavPages.IsUsersSelected(ViewContext)></panelbar-item>
+ *@        </items>
+      </panelbar-item>
+    }
+    else if (isManager && !isAdmin)
+    {
+      <panelbar-item text="Settings" expanded=@NavPages.IsSettingsExpanded(ViewContext)>
+        <items>
+          <panelbar-item text="Users" href="/Users" selected=@NavPages.IsUsersSelected(ViewContext)></panelbar-item>
+        </items>
+      </panelbar-item>
+    }
+
+@*     <panelbar-item text="My Account" expanded=@NavPages.IsAccountExpanded(ViewContext)>
+      <items>
+        <panelbar-item text="Profile" href="/Identity/Account/Manage/Profile" selected=@NavPages.IsProfileSelected(ViewContext)></panelbar-item>
+        <panelbar-item text="Email" href="/Identity/Account/Manage/Email" selected=@NavPages.IsEmailSelected(ViewContext)></panelbar-item>
+        <panelbar-item text="Change password" href="/Identity/Account/Manage/ChangePassword" selected=@NavPages.IsChangePasswordSelected(ViewContext)></panelbar-item>
+        @if (hasExternalLogins)
+        {
+          <panelbar-item text="External logins" href="/Identity/Account/Manage/ExternalLogins" selected=@NavPages.IsExternalLoginsSelected(ViewContext)></panelbar-item>
+        }
+        <panelbar-item text="Two-factor authentication" href="/Identity/Account/Manage/TwoFactorAuthentication" selected=@NavPages.IsTwoFactorAuthenticationSelected(ViewContext)></panelbar-item>
+        <panelbar-item text="Personal data" href="/Identity/Account/Manage/PersonalData" selected=@NavPages.IsPersonalDataSelected(ViewContext)></panelbar-item>
+      </items>
+    </panelbar-item> *@
+    <panelbar-item text="Privacy" href="/home/privacy" selected=@NavPages.IsPrivacySelected(ViewContext)></panelbar-item>
+  </items>
+</kendo-panelbar>

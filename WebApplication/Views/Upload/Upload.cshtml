@@ -1,0 +1,23 @@
+﻿<div>
+
+  @(Html.Kendo().Upload()
+    .Name("files")
+    .Async(a => a
+      .Save("Chunk_Upload_Save", "upload")
+      .Remove("Chunk_Upload_Remove", "upload")
+      .AutoUpload(true)
+      .ChunkSize(1000000)
+    )
+    .Multiple(false)
+    .Validation(validation =>
+    {
+      validation.MaxFileSize(20000000);
+      validation.AllowedExtensions(new string[] { ".txt", ".csv", ".xlsx" });
+    })
+    .Events(e => e.Success("onFileUploaded"))
+    .HtmlAttributes(new { accept = ".txt,.csv,.xlsx" })
+    //.Messages(m => m.UploadSelectedFiles("AAA"))
+    )
+</div>
+
+

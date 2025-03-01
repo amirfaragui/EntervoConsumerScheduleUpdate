@@ -1,0 +1,66 @@
+﻿@using T2Importer.DAL;
+
+@(
+Html.Kendo().Grid<Permit>()
+    .Name("permitsGrid")
+    .Columns(columns =>
+    {
+      columns.Bound(model => model.PermitNumber).Width(100);
+      columns.Bound(model => model.AccessGroup).Width(100);
+      columns.Bound(model => model.ExpirationDate).Width(120).Format("{0:yyyy/MM/dd}");
+      columns.Bound(model => model.PermitAmountDue).Width(100);
+      columns.Bound(model => model.RenewalStatus).Width(100);
+      columns.Bound(model => model.Comment).Width(150);
+
+      columns.Command(command =>
+      {
+        command.Custom("Details").Text("Details").Click("onPermitDetails");
+        command.Destroy();
+      }).Width(80);
+    })
+    .ToolBar(toolbar =>
+    {
+      toolbar.Custom().ClientTemplate(
+          Html.Kendo().Template().AddComponent(c => c
+              .Button()
+              .Name("create")
+              .Content("Create")
+              .Icon("plus")
+              .HtmlAttributes(new { title = "Create" })
+              .Events(ev => ev.Click("onCreatePermit"))
+          )); toolbar.Separator();
+      toolbar.Search();
+    })
+    .Pageable(p =>
+    {
+      p.Refresh(true);
+      p.PageSizes(new int[] { 100, 500 });
+    })
+    .Scrollable(scrollable => scrollable.Enabled(true).Height("calc(100vh - 450px)").Virtual(true))
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .DataSource(datasource => datasource
+      .Ajax()
+      .PageSize(100)
+      .Model(model =>
+      {
+        model.Id(o => o.PermitUID);
+        model.Field(o => o.PurchasingCustomer).DefaultValue(ViewData["CustomerUID"]);
+      })
+      .Sort(sort => sort.Add(m => m.PermitNumber).Ascending())
+      .Read(read => read.Action("_read", "permits").Data("getCustomerId"))
+      .Update(update => update.Action("_update", "permits"))
+      .Destroy(destroy => destroy.Action("_destroy", "permits"))
+    )
+    .Resizable(resize => resize.Columns(true))
+    .Sortable(sort => sort.SortMode(GridSortMode.SingleColumn))
+    .Search(search => search
+      .Field(m => m.PermitNumber)
+      .Field(m => m.Comment)
+    )
+)
+
+@section Scripts {
+  <script type="text/javascript">
+
+  </script>
+}

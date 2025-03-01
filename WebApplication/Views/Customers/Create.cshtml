@@ -1,0 +1,71 @@
+﻿@using T2Importer.DAL;
+@model Customer
+
+@{
+  ViewData["Title"] = "Customer Details";
+  ViewData["ActivePage"] = "Customers|Create";
+}
+
+<h3>Create New Customer</h3>
+
+<style>
+  #horizontal {
+    height: calc(100vh - 160px);
+  }
+
+  .pane {
+    padding: 16px;
+  }
+</style>
+
+
+<kendo-splitter name="horizontal" orientation="SplitterOrientation.Horizontal">
+  <pane size="500px" scrollable="true" collapsible="false" id="leftPane">
+    <div class="pane">
+      <kendo-form name="form" form-data="@Model" method="post" asp-action="create" asp-controller="customers" orientation="horizontal">
+        <validatable validate-on-blur="true" validation-summary="true" />
+        <form-items>
+          <form-item field="EmployeeID"><textbox-editor></textbox-editor></form-item>
+          <form-item field="CustomerType"><textbox-editor></textbox-editor></form-item>
+          <form-item field="FirstName"></form-item>
+          <form-item field="LastName"></form-item>
+          <form-item field="MiddleName"></form-item>
+          <form-item field="AccountBalance"></form-item>
+          <form-item field="BalanceDue"></form-item>
+          <form-item field="NamePrefix"></form-item>
+          <form-item field="NameSuffix"></form-item>
+          <form-item field="HomePhone"><maskedtextbox-editor mask="(999) 000-0000"></maskedtextbox-editor></form-item>
+          <form-item field="WorkPhone"></form-item>
+          <form-item field="OtherPhone"><maskedtextbox-editor mask="(999) 000-0000"></maskedtextbox-editor></form-item>
+          <form-item field="PrimaryAddress"></form-item>
+          <form-item field="AllotmentGroup"></form-item>
+          <form-item field="NonEmployeeID"></form-item>
+          <form-item field="TertiaryID"></form-item>
+          <form-item field="Classification"></form-item>
+          <form-item field="Subclassification"></form-item>
+        </form-items>
+      </kendo-form>
+    </div>
+  </pane>
+
+  <pane collapsible="true" resizable="true" id="rightPane">
+    <kendo-panelbar name="vertical" expand-mode="single">
+      <items>
+@*         <panelbar-item text="Permits" content-url='@Url.Action("customerPermits","permits", new { id = Model.CustomerUID })' expanded="true"></panelbar-item>
+        <panelbar-item text="Emails" content-url='@Url.Action("index","emails", new { id = Model.CustomerUID })'></panelbar-item>
+        <panelbar-item text="Notes" content-url='@Url.Action("customerNotes","notes", new { id = Model.CustomerUID })'></panelbar-item>
+ *@      </items>
+    </kendo-panelbar>
+  </pane>
+</kendo-splitter>
+
+
+@section Scripts {
+  <script type="text/javascript">
+    // function getCustomerId() {
+    //   return {
+    //     customerId: @Model.CustomerUID
+    //   };
+    // }
+  </script>
+}

@@ -1,0 +1,44 @@
+﻿@page
+@using Microsoft.AspNetCore.Http.Features
+@model TwoFactorAuthenticationModel
+@{
+  ViewData["Title"] = "Two-factor authentication (2FA)";
+  ViewData["ActivePage"] = "Account|TwoFactorAuthentication";
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<h3>@ViewData["Title"]</h3>
+@{
+  var consentFeature = HttpContext.Features.Get<ITrackingConsentFeature>();
+  @if (consentFeature?.CanTrack ?? true)
+  {
+    @if (Model.Is2faEnabled)
+    {
+
+      if (Model.IsMachineRemembered)
+      {
+        <form method="post" style="display: inline-block">
+          <button type="submit" class="btn btn-primary">Forget this browser</button>
+        </form>
+      }
+      <a asp-page="./Disable2fa" class="btn btn-primary">Disable 2FA</a>
+      //<a asp-page="./GenerateRecoveryCodes" class="btn btn-primary">Reset recovery codes</a>
+    }
+    else
+    {
+      <a asp-page="./Enable2fa" class="btn btn-primary">Enable 2FA</a>
+
+    }
+  }
+  else
+  {
+    <div class="alert alert-danger">
+      <strong>Privacy and cookie policy have not been accepted.</strong>
+      <p>You must accept the policy before you can enable two factor authentication.</p>
+    </div>
+  }
+}
+
+@section Scripts {
+  <partial name="_ValidationScriptsPartial" />
+}

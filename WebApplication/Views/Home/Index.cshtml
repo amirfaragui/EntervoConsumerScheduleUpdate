@@ -1,0 +1,157 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<style>
+
+  #drawer-content li {
+      font-size: 1.2em;
+      padding-left: .89em;
+      background: 0 0;
+      border-radius: 0;
+      border-width: 0 0 1px;
+      border-color: rgba(33, 37, 41, 0.125);
+      border-style: solid;
+      line-height: 1.5em;
+      padding: 1.09em .84em 1.23em .84em;
+  }
+
+      #drawer-content li:last-child {
+          border: 0;
+      }
+
+  .hidden {
+      display: none;
+  }
+
+  #example .demo-section {
+      max-width: 640px;
+  }
+
+  .k-toolbar .k-icon {
+      font-size: 18px;
+  }
+</style>
+
+<script id="template" type="text/x-kendo-template">
+  <ul>
+      <li data-role='drawer-item' class='k-state-selected'><i class='k-icon k-i-barcode-qr-code-scanner'></i><span class='k-item-text' data-id='Permits'>Permits</span></li>
+      <li data-role='drawer-separator'></li>
+      <li data-role='drawer-item'><span class='k-icon k-i-clock'></span><span class='k-item-text' data-id='History'>History</span></li>
+      <li data-role='drawer-item'><span class='k-icon k-i-calendar'></span><span class='k-item-text' data-id='Calendar'>Calendar</span></li>
+      <li data-role='drawer-item'><span class='k-icon k-i-hyperlink-email'></span><span class='k-item-text' data-id='Attachments'>Attachments</span></li>
+      <li data-role='drawer-separator'></li>
+      <li data-role='drawer-item'><span class='k-icon k-i-star-outline k-i-bookmark-outline'></span><span class='k-item-text' data-id='Favourites'>Favourites</span></li>
+      <li data-role='drawer-separator'></li>
+      <li data-role='drawer-item'><span class='k-icon k-i-user'></span><span class='k-item-text' data-id='Account'>My Account</span></li>
+
+  </ul>
+</script>
+
+<kendo-toolbar name="ToolBar">
+  <toolbar-items>
+    <item type="CommandType.Button" icon="menu" class="k-flat" click="toggleDrawer" />
+    <item template="<h3 style='margin-left: 20px;'>Hi, Jason</h3>" />
+  </toolbar-items>
+</kendo-toolbar>
+
+<kendo-drawer name="drawer" mode="push" position="left" swipe-to-open="true" on-item-click="onItemClick" template-id="template">
+  <mini enabled="true" />
+  <content>
+    <div id="drawer-content">
+      <div id='Permits' class='hidden' template-link='@Url.Action("index", "permits")'>
+      </div>
+      <div id='History' class='hidden'>
+        <ul>
+          <li>Monday meeting</li>
+          <li>Regarding org chart changes</li>
+          <li>Meeting with Cliff</li>
+          <li>Global Marketing Meeting</li>
+          <li>Out tonight with collegues?</li>
+        </ul>
+      </div>
+      <div id='Calendar' class='hidden'>
+        <ul>
+          <li>
+            <h6>11/5 Monday</h6>
+            <p>Martha Birthday</p>
+          </li>
+          <li>
+            <h6>15/6 Sunday</h6>
+            <p>Job interview for internal position</p>
+          </li>
+        </ul>
+      </div>
+      <div id='Attachments' class='hidden'>
+        <ul>
+          <li>Build enterprise apps</li>
+          <li>Fw: Regarding Multiline textbox</li>
+          <li>Away next week</li>
+          <li>Fw: Your Costume is ready</li>
+          <li>Update completed</li>
+        </ul>
+      </div>
+      <div id='Favourites' class='hidden'>
+        <ul>
+          <li>90% Discount!</li>
+          <li>90% Discount!</li>
+          <li>One time offer!</li>
+        </ul>
+      </div>
+      <div id='Account' class='hidden' template-link='/Identity/Account/Manage'>
+      </div>
+    </div>
+  </content>
+</kendo-drawer>
+
+@section Scripts {
+<script type="text/javascript">
+  function onItemClick(e) {
+      e.sender.drawerContainer.find("#drawer-content > div").addClass("hidden");
+      var content = e.item.find(".k-item-text").attr("data-id");
+      var selected = e.sender.drawerContainer.find("#drawer-content").find("#" + content);
+      if (selected !== undefined) {
+          var link = selected.attr("template-link");
+          if (link !== undefined) {
+            $.ajax({
+              url: link,
+              method: 'GET',
+              success: function (result) {
+                selected.html(result);
+                selected.removeAttr("template-link");
+              }
+            });
+          }
+          selected.removeClass("hidden");
+      }
+  }
+
+  function toggleDrawer() {
+      var drawerInstance = $("#drawer").data().kendoDrawer;
+      var drawerContainer = drawerInstance.drawerContainer;
+      if(drawerContainer.hasClass("k-drawer-expanded")) {
+          drawerInstance.hide();
+      } else {
+          drawerInstance.show();
+      }
+  }
+
+  //$(function (e) {
+  //  var first =$("#drawer-content div:first-child");
+  //  if (first !== undefined) {
+  //    var link = first.attr("template-link");
+  //    if (link !== undefined) {
+  //      $.ajax({
+  //        url: link,
+  //        method: 'GET',
+  //        success: function (result) {
+  //          first.html(result);
+  //          first.removeAttr("template-link");
+  //          first.removeClass("hidden");
+  //        }
+  //      });
+  //    }
+  //  }
+  //});
+</script>
+}

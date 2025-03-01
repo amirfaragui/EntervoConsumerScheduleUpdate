@@ -1,0 +1,54 @@
+﻿@using T2Importer.DAL;
+<div class="pane">
+@(
+Html.Kendo().Grid<PermitNote>()
+    .Name("notesGrid")
+    .Columns(columns =>
+    {
+      columns.Bound(model => model.NoteType).Width(100);
+      columns.Bound(model => model.NoteText).Width(250).EditorTemplateName("TextArea");
+      columns.Bound(model => model.EndDate).Width(120).Format("{0:yyyy/MM/dd}");
+      columns.Bound(model => model.Document).Width(150);
+
+      columns.Command(command =>
+      {
+        command.Edit();
+        command.Destroy();
+      }).Width(150);
+    })
+    .ToolBar(toolbar =>
+    {
+      toolbar.Create();
+      toolbar.Separator();
+      toolbar.Search();
+    })
+    .Pageable(p =>
+    {
+      p.Refresh(true);
+      p.PageSizes(new int[] { 100, 500 });
+    })
+    .Scrollable(scrollable => scrollable.Enabled(true).Height("calc(100vh - 380px)").Virtual(true))
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .DataSource(datasource => datasource
+    .Ajax().PageSize(100)
+      .Model(model =>
+      {
+        model.Id(o => o.NoteUID);
+      })      
+      .Read(read => read.Action("permitnotes_read", "notes").Data("getPermitId"))
+      .Update(update => update.Action("permitnotes_update", "notes"))
+      .Destroy(destroy => destroy.Action("permitnotes_destroy", "notes"))
+      .Create(create => create.Action("permitnotes_create", "notes").Data("getPermitId"))
+    )
+    .Resizable(resize => resize.Columns(true))
+    .Sortable(sort => sort.SortMode(GridSortMode.SingleColumn))
+    .Search(search => search
+      .Field(m => m.NoteText)
+    )
+)
+
+@section Scripts {
+  <script type="text/javascript">
+
+  </script>
+}

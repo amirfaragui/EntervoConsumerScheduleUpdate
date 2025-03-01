@@ -1,0 +1,222 @@
+﻿@{
+  ViewData["Title"] = "Import Emails";
+  ViewData["ActivePage"] = "Import|Emails";
+}
+<h3>Import Emails</h3>
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model ImportSourceModel
+
+@(
+Html.Kendo().Wizard()
+  .Name("wizard")
+  .LoadOnDemand(true)
+  .ReloadOnSelect(true)
+  .Steps(steps =>
+  {
+    steps.Add().Title("Source File").ContentUrl(Url.Action("upload", "emails"))
+      .Buttons(b => b.Next());
+
+    steps.Add<ImportSourceModel>().Title("Options").Form(f => f
+        .FormData(Model)
+        .Validatable(v =>
+        {
+          v.ValidateOnBlur(true);
+          v.ValidationSummary(vs => vs.Enable(false));
+        })
+        .Items(items =>
+        {
+          items.Add().Field(m => m.FileName).Editor(e => e.TextBox().Readonly(true));
+          items.Add().Field(m => m.UploadId).Editor(e => e.Hidden());
+          items.Add().Field(m => m.Delimiter).Editor(e => e.DropDownList()
+            .Items(l =>
+            {
+              l.Add().Value(",").Text("comma");
+              l.Add().Value(";").Text("semi-colon");
+              l.Add().Value("\t").Text("tab");
+            }));
+          items.Add().Field(m => m.FirstLineHeader).Editor(e => e.Switch());
+
+        })
+    )
+    .Enabled(false)
+    .Buttons(b =>
+    {
+      b.Previous();
+      b.Next();
+    });
+
+    steps.Add().Title("Mappings").ContentUrl(Url.Action("mappings", "emails"))
+    .Buttons(b =>
+    {
+      b.Previous();
+      b.Next();
+    });
+
+    steps.Add<ImportSourceModel>().Title("Default Values").Form(f => f
+        .FormData(Model)
+        .Validatable(v =>
+        {
+          v.ValidateOnBlur(true);
+          v.ValidationSummary(vs => vs.Enable(false));
+        })
+        .Layout("grid").Grid(g => g.Cols(2).Gutter(10))
+        .Items(items =>
+        {
+          items.Add().Field(m => m.Delimiter).Editor(e => e.TextBox().Readonly());
+@*      
+          items.Add().Field(m => m.DefaultSiteCode).Editor(e => e.DropDownList().ValuePrimitive(true).DataTextField("Text").DataValueField("Value")
+            .BindTo((System.Collections.IEnumerable)ViewBag.SiteCodes));
+          items.Add().Field(m => m.DefaultIdentifierType).Editor(e => e.DropDownList().ValuePrimitive(true).DataTextField("Text").DataValueField("Value")
+            .BindTo((System.Collections.IEnumerable)ViewBag.CardTypes));
+          items.Add().Field(m => m.CardFunction).Editor(e => e.DropDownList().ValuePrimitive(true).DataTextField("Text").DataValueField("Value")
+            .BindTo((System.Collections.IEnumerable)ViewBag.CardFunctions));          
+          items.Add().Field(m => m.DefaultGroupId).Editor(e => e.ComboBox().ValuePrimitive(true).DataTextField("name").DataValueField("id").Filter(FilterType.StartsWith)
+            .DataSource(ds => ds.Read(read => read.Action("list", "groups"))));
+          items.Add().Field(m => m.DefaultCompanyId).Editor(e => e.ComboBox().ValuePrimitive(true).DataTextField("name").DataValueField("id").Filter(FilterType.StartsWith)
+            .DataSource(ds => ds.Read(read => read.Action("list", "companies"))));
+          items.Add().Field(m => m.DefaultTermId).Editor(e => e.ComboBox().ValuePrimitive(true).DataTextField("name").DataValueField("id").Filter(FilterType.StartsWith)
+            .DataSource(ds => ds.Read(read => read.Action("list", "terms"))));
+*@
+
+        })
+    )
+    .Buttons(b =>
+    {
+      b.Previous();
+      b.Done();
+    });
+  })
+  .Events(events => events.Select("onStepSelected").Activate("onStepActivated").Done("onDone"))
+)
+
+@(Html.Kendo().Notification().Name("error")
+  .Animation(animation =>
+  {
+    animation.Open(open => open.SlideIn(SlideDirection.Left).Duration(AnimationDuration.Normal));
+    animation.Close(c => c.Fade(FadeDirection.Out).Duration(AnimationDuration.Slow));
+  })
+  .Position(postion => postion.Top(70))
+)
+
+@section Scripts {
+  <script type="text/javascript">
+    var done = false;
+    var mappingUrl = '@Url.Action("mappings", "emails")?fileName=';
+
+    function onFileUploaded(e) {
+      if (e.operation === "upload") {
+        var wizard = $("#wizard").data("kendoWizard");
+        wizard.enableStep(1, true);
+        var model = wizard._steps[1].form._model;
+        model.UploadId = e.files[0].uid;
+        model.FileName = e.files[0].name;
+        wizard.next();
+        var filename = $("#FileName");
+        filename.val(e.files[0].name);
+      }
+    }
+
+    function onStepSelected(e) {
+      if (e.step.options.index === 2) {
+        var href = new URL(window.location.href);
+        var baseURL = `${href.protocol}//${href.host}`;
+        var url = new URL('@Url.Action("mappings", "emails")', baseURL);
+
+        var wizard = $("#wizard").data("kendoWizard");
+        var model = wizard._steps[1].form._model;
+        url.searchParams.append("fileName", model.FileName);
+        url.searchParams.append("separator", model.Delimiter);
+        url.searchParams.append("headers", model.FirstLineHeader);
+        wizard._steps[2].options.contentUrl = url.href;
+      }
+    }
+
+    function onStepActivated(e) {
+      if (e.step.options.index === 2) {
+        $(".mapDropDownList").kendoDropDownList();
+        $(".mapFormat").kendoTextBox();
+
+        var listview = $("#mappings").data("kendoListView");
+        var mappings = listview.dataSource.view().toJSON();
+        mappings.forEach(i => {          
+          $(`#Target_${i.Index}`).data("kendoDropDownList").value(i.Target);
+          $(`#Format_${i.Index}`).data("kendoTextBox").value(i.Format);
+       });
+      }
+    }
+
+    function onDone(e) {
+      var o = {};
+      o.FileName = e.forms[0]._model.FileName;
+      o.Delimiter = e.forms[0]._model.Delimiter;
+      o.FirstLineHeader = e.forms[0]._model.FirstLineHeader;
+
+      // o.DefaultSiteCode = $("#DefaultSiteCode").data("kendoDropDownList").value();
+      // o.DefaultIdentifierType = $("#DefaultIdentifierType").data("kendoDropDownList").value();
+      // o.CardFunction = $("#CardFunction").data("kendoDropDownList").value();
+      // o.DefaultGroupId = $("#DefaultGroupId").data("kendoComboBox").value();
+      // o.DefaultCompanyId = $("#DefaultCompanyId").data("kendoComboBox").value();
+      // o.DefaultTermId = $("#DefaultTermId").data("kendoComboBox").value();
+
+      var listview = $("#mappings").data("kendoListView");
+      var mappings = listview.dataSource.view().toJSON();
+      mappings.forEach(i => {
+        i.Target = $(`#Target_${i.Index}`).data("kendoDropDownList").value();
+        i.Format = $(`#Format_${i.Index}`).data("kendoTextBox").value();
+      });
+      o.Mappings = mappings;
+
+      var url = '@Url.Action("process", "emails")';
+      $.post(url, o, function (data) {
+        if (data.Success === true) {
+          var href = new URL(window.location.href);
+          var baseURL =  `${href.protocol}//${href.host}`;
+          var request = new URL('@Url.Action("progress", "emails")', baseURL);
+          request.searchParams.append("jobId", encodeURIComponent(data.JobId));
+          done = true;
+          window.location.href = request.href;
+        }
+        else {
+          showError(data.Message);
+        }
+      })
+        .fail(function (e) {
+          var m = JSON.parse(e.responseText);
+          showError(m.error);
+        });
+    }
+
+
+    function getElementName(prefix, index) {
+      return `${prefix}_${index}`;
+    }
+
+    function showError(message) {
+      var popupNotification = $("#error").data("kendoNotification");
+      popupNotification.error(message);
+    }
+
+    $(function () {
+      window.addEventListener('beforeunload', onBeforeUnload);
+    });
+
+    function onBeforeUnload() {
+      if (!done) {
+        console.log("should delete file...");
+        var href = new URL(window.location.href);
+        var baseURL = `${href.protocol}//${href.host}`;
+        var url = new URL('@Url.Action("abort", "emails")', baseURL);
+
+        var wizard = $("#wizard").data("kendoWizard");
+        var model = wizard._steps[1].form._model;
+        url.searchParams.append("fileName", model.FileName);
+
+        $.post(url.href);
+      }
+      return null;
+    }
+  </script>
+}

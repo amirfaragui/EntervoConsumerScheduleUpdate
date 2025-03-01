@@ -1,0 +1,141 @@
+﻿@{
+  ViewData["ActivePage"] = "Settings|Source";
+  ViewData["Title"] = "FTP Source";
+
+}
+@model FtpOptionsModel
+
+
+<div id="confirmation" class="demo-section"></div>
+
+@(
+Html.Kendo().Form<FtpOptionsModel>()
+  .Name("form")
+  .HtmlAttributes(new { method = "POST", action = @Url.Action("updateRootDirectory", "ftpsource") })
+  .Events(events => events.Submit("onSubmit"))
+  .FormData(Model)
+  .ButtonsTemplateId("buttons")
+  .Validatable(v =>
+  {
+    v.ValidateOnBlur(true);
+    v.ValidationSummary(false);
+  })
+  .Items(i =>
+  {
+    i.AddAntiForgeryToken(Html.AntiForgeryToken());
+
+    i.AddGroup().Label("FTP Options")
+      .Items(i =>
+      {
+        i.Add().Field(m => m.RootDirectory).Editor(e => e.ComboBox()
+          .BindTo(Model.Folders)
+          .Filter(FilterType.StartsWith)
+          .ValuePrimitive(true)
+        );
+      });
+  })
+)
+
+@(Html.Kendo().Notification().Name("notification").AppendTo("#confirmation").AutoHideAfter(5000)
+  .Events(events => events.Hide("onDismiss"))
+)
+
+@(Html.Kendo().Window()
+  .Name("progressWindow")
+  .Title("Updateing settings...")
+  .Actions(actions =>
+  {
+    actions.Clear();
+  })
+  .Width(300).Height(125)
+  .Modal()
+  .Visible(false)
+  .Animation(animation =>
+  {
+    animation.Open(open =>
+    {
+      open.Zoom(ZoomDirection.In);
+    });
+    animation.Close(close =>
+    {
+      close.Zoom(ZoomDirection.Out);
+    });
+  })
+)
+
+<style>
+  .k-form-buttons {
+    margin-bottom: 75px;
+  }
+
+    .k-form-buttons .k-button {
+      width: 90px;
+    }
+
+  .demo-section {
+    text-align: center;
+    line-height: 4em;
+    padding: 8px 0px;
+  }
+
+    .demo-section .k-button {
+      width: 250px;
+    }
+
+  .progress-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    height: 100%;
+  }
+
+  .k-window .k-window-titlebar {
+    display: none;
+  }
+
+  @@media (max-width: 1000px) {
+    .k-d-grid {
+      display: block;
+    }
+  }
+</style>
+
+@section Scripts {
+  <script type="text/kendo-x-template" id="buttons">
+    <button class="k-button k-button-md k-rounded-md k-button-solid k-button-solid-primary k-form-submit" type="submit">
+      <span class="k-button-text">Update</span>
+    </button>
+  </script>
+
+  <script type="text/x-kendo-template" id="windowContent">
+    <div class="progress-container">
+    @Html.Kendo().Loader().Name("progress").Size(LoaderSize.Medium).Type(LoaderType.InfiniteSpinner).ToClientTemplate()
+    <span>Updating settings...</span>
+    </div>
+  </script>
+
+  <script>
+    function onSubmit(e) {
+      var template = kendo.template($("#windowContent").html());
+      $("#progressWindow").data("kendoWindow")
+        .content(template)
+        .center().open();
+    }
+
+    function onDismiss(e) {
+      var status = '@ViewBag.Status';
+    }
+
+
+    $(document).ready(function () {
+      var status = '@ViewBag.Status';
+      var message = '@ViewBag.Message';
+      if (message !== '') {
+        var notification = $("#notification").data("kendoNotification");
+        notification.show(message, status);
+      }
+    });
+  </script>
+}

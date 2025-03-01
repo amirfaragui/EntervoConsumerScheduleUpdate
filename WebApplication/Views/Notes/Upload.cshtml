@@ -1,0 +1,22 @@
+﻿<div>
+
+  @(Html.Kendo().Upload()
+    .Name("files")
+    .Async(a => a
+    .Save("Chunk_Upload_Save", "notes")
+    .Remove("Chunk_Upload_Remove", "notes")
+    .AutoUpload(true)
+    .ChunkSize(1000000)
+    )
+    .Multiple(false)
+    .Validation(validation =>
+    {
+      validation.MaxFileSize(20000000);
+      validation.AllowedExtensions(new string[] { ".csv" });
+    })
+    .Events(e => e.Success("onFileUploaded"))
+    .HtmlAttributes(new { accept = ".csv" })
+    )
+</div>
+
+

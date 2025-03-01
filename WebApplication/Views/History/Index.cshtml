@@ -1,0 +1,83 @@
+﻿@{
+  ViewData["Title"] = "History";
+  ViewData["ActivePage"] = "History|History";
+}
+
+<h3>History</h3>
+
+
+<script id="eventTemplate" type="text/x-kendo-template">
+  <div class="k-card-inner">
+      <div class="k-card-header">
+          <h5 class="k-card-title">#= data.Title #</h5>
+          <h6 class="k-card-subtitle">#= data.Description #</h6>
+      </div>
+      <div class="k-card-body">
+          <div class="k-card-description">
+              <pre>#= data.Url #</pre>
+           </div>
+      </div>
+      <div class="k-card-actions">
+        # for (var i =0; i < data.Actions.length; i++) { #
+            <a class="k-button k-button-flat-primary k-button-flat k-button-md k-rounded-md" href="#= data.Actions[i].url #" >#= data.Actions[i].text #</a>
+        # } #
+      </div>
+  </div>
+</script>
+
+<style>
+  .k-event-title {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .k-card-subtitle {
+    font-size: 12px;
+    color: #777;
+  }
+
+  .k-card-description {
+    font-size: 12px;
+  }
+
+  .k-card-actions .k-button-text {
+    font-size: 14px;
+  }
+
+  .k-card-actions .k-button {
+    min-width: 60px;
+  }
+
+  pre {
+    white-space: pre-wrap; /* css-3 */
+    white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+    white-space: -pre-wrap; /* Opera 4-6 */
+    white-space: -o-pre-wrap; /* Opera 7 */
+    word-wrap: break-word; /* Internet Explorer 5.5+ */
+  }
+</style>
+
+@(Html.Kendo().DataSource<History>()
+    .Name("sharedDataSource")
+    .Custom(dataSource => dataSource
+       .Transport(tr => tr.Read(read => read.Action("_read", "history")))
+       .Sort(sort => sort.Add(m => m.EventTime).Descending())
+    )
+)
+
+@(Html.Kendo().Timeline<History>()
+  .Name("timeline")
+  .Orientation(TimelineOrientation.Vertical)
+  .DateFormat("MM/dd HH:mm")
+  .DataDateField("EventTime")
+  .DataTitleField("Title")
+  .DataSubtitleField("Subtitle")
+  .DataDescriptionField("Description")
+  .DataActionsField("Actions")
+  .AlternatingMode(false)
+  .EventTemplateId("eventTemplate")
+  .Navigatable()
+  .CollapsibleEvents()
+  .DataSource("sharedDataSource")
+  .EventWidth(600)
+)

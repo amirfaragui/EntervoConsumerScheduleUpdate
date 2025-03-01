@@ -1,0 +1,74 @@
+﻿@{
+  ViewData["Title"] = "Consumers";
+  ViewData["ActivePage"] = "Cards|Consumers";
+}
+@using T2Importer.DAL;
+<h3>Consumers</h3>
+
+@(
+Html.Kendo().Grid<Consumer>()
+    .Name("grid")
+    .Columns(columns =>
+    {
+      columns.Bound(model => model.CardNumber).Width(100);
+      columns.Bound(model => model.FirstName).Width(100);
+      columns.Bound(model => model.LastName).Width(100);
+      columns.Bound(model => model.ClientRef).Width(120);
+      columns.Bound(model => model.LPN1).Width(100).Title("Plate Number");
+
+      columns.Bound(model => model.Memo1).Width(80);
+      columns.Bound(model => model.ValidUntil).Width(100).Format("{0:yyyy-MM-dd}"); ;
+
+      columns.Command(command =>
+      {
+        command.Custom("History").Text("History").Click("onHistory");
+      }).Width(80);
+    })
+    .ToolBar(toolbar =>
+    {
+      toolbar.Excel();
+      toolbar.Search();
+    })
+    .Pageable(p =>
+    {
+      p.Refresh(true);
+      p.PageSizes(new int[] { 100, 500 });
+    })
+    .Scrollable(scrollable => scrollable.Enabled(true).Height("calc(100vh - 310px)").Virtual(true))
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .DataSource(datasource => datasource
+    .Ajax().PageSize(100)
+      .Model(model =>
+      {
+        model.Id(o => o.CardNumber);
+      })
+      .Sort(sort => sort.Add(m => m.CardNumber).Ascending())
+      .Read(read => read.Action("_read", "consumers"))
+    )
+    .Resizable(resize => resize.Columns(true))
+    .Sortable(sort => sort.SortMode(GridSortMode.SingleColumn))
+    .Search(search => search
+      .Field(m => m.CardNumber)
+      .Field(m => m.FirstName)
+      .Field(m => m.LastName)
+      .Field(m => m.ClientRef)
+      .Field(m => m.LPN1)
+    )
+    .Excel(excel => excel
+      .FileName("consumers.xlsx")
+      .Filterable(true)
+      .AllPages(true)
+      .ProxyURL(Url.Action("export", "consumers"))
+    )
+)
+
+@section Scripts {
+  <script type="text/javascript">
+    function onHistory(e) {
+      e.preventDefault();
+      var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+      var url = '@Url.Action("index", "history")?cardNumber=' + dataItem.CardNumber;
+      window.open(url, '_blank');
+    }
+  </script>
+}

@@ -1,0 +1,67 @@
+﻿@using T2Importer.DAL;
+@model Permit
+
+@{
+  ViewData["Title"] = "Permit Details";
+  ViewData["ActivePage"] = "Permits|Edit";
+}
+
+<h3>Permit Details</h3>
+
+<style>
+  #horizontal {
+    height: calc(100vh - 160px);
+  }
+
+  .pane {
+    padding: 16px;
+  }
+</style>
+
+
+<kendo-splitter name="horizontal" orientation="SplitterOrientation.Horizontal">
+  <pane size="500px" scrollable="true" collapsible="false" id="leftPane">
+    <div class="pane">
+      <kendo-form name="form" form-data="@Model" method="post" asp-action="edit" asp-controller="permits" orientation="horizontal">
+        <validatable validate-on-blur="true" validation-summary="true" />
+        <form-items>
+          <form-item field="PermitUID"><textbox-editor readonly="true"></textbox-editor></form-item>
+          <form-item field="PurchasingCustomer"><textbox-editor readonly="true"></textbox-editor></form-item>
+          <form-item field="PermitNumber"></form-item>
+          <form-item field="AccessGroup"></form-item>
+          <form-item field="PermitAmountDue"></form-item>
+          <form-item field="DepositFee"></form-item>
+          <form-item field="DepositAmountPaid"></form-item>
+          <form-item field="EffectiveDate"></form-item>
+          <form-item field="ExpirationDate"></form-item>
+          <form-item field="IssueNumber"><numerictextbox-editor format="#"></numerictextbox-editor></form-item>
+          <form-item field="IsDeactivated"><switch-editor></switch-editor></form-item>
+          <form-item field="IsMissing"><switch-editor></switch-editor></form-item>
+          <form-item field="IsTerminated"><switch-editor></switch-editor></form-item>
+          <form-item field="ReplacementPermit"></form-item>
+          <form-item field="WorkflowStatus"></form-item>
+          <form-item field="Comment"><textarea-editor rows="5"></textarea-editor></form-item>
+        </form-items>
+      </kendo-form>
+    </div>
+  </pane>
+
+  <pane collapsible="true" resizable="true" id="rightPane">
+    <kendo-panelbar name="vertical" expand-mode="single">
+      <items>
+        <panelbar-item text="Notes" content-url='@Url.Action("permitNotes","notes", new { id = Model.PermitUID })' expanded="true"></panelbar-item>
+      </items>
+    </kendo-panelbar>
+  </pane>
+</kendo-splitter>
+
+
+@section Scripts {
+  <script type="text/javascript">
+    function getPermitId() {
+      return {
+        permitId: @Model.PermitUID
+      };
+    }
+  </script>
+}

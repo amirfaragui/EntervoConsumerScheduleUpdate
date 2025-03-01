@@ -1,0 +1,61 @@
+﻿@using T2Importer.DAL;
+@model Permit
+
+@{
+  ViewData["Title"] = "Create new Permit";
+  ViewData["ActivePage"] = "Permits|Create";
+}
+
+<h3>Create New Permit</h3>
+
+<style>
+  #horizontal {
+    height: calc(100vh - 160px);
+  }
+
+  .pane {
+    padding: 16px;
+  }
+</style>
+
+
+<kendo-splitter name="horizontal" orientation="SplitterOrientation.Horizontal">
+  <pane size="500px" scrollable="true" collapsible="false" id="leftPane">
+    <div class="pane">
+      <kendo-form name="form" form-data="@Model" method="post" asp-action="create" asp-controller="permits" orientation="horizontal">
+        <validatable validate-on-blur="true" validation-summary="true" />
+        <form-items>
+          <form-item field="PurchasingCustomer"><textbox-editor readonly="true"></textbox-editor></form-item>
+          <form-item field="PermitNumber"></form-item>
+          <form-item field="AccessGroup"></form-item>
+          <form-item field="PermitAmountDue"><numerictextbox-editor></numerictextbox-editor></form-item>
+          <form-item field="DepositFee"><numerictextbox-editor></numerictextbox-editor></form-item>
+          <form-item field="DepositAmountPaid"><numerictextbox-editor></numerictextbox-editor></form-item>
+          <form-item field="EffectiveDate"><datepicker-editor></datepicker-editor></form-item>
+          <form-item field="ExpirationDate"><datepicker-editor></datepicker-editor></form-item>
+          <form-item field="IssueNumber"><numerictextbox-editor format="#"></numerictextbox-editor></form-item>
+          <form-item field="IsDeactivated"><switch-editor></switch-editor></form-item>
+          <form-item field="IsMissing"><switch-editor></switch-editor></form-item>
+          <form-item field="IsTerminated"><switch-editor></switch-editor></form-item>
+          <form-item field="ReplacementPermit"></form-item>
+          <form-item field="WorkflowStatus"></form-item>
+          <form-item field="Comment"><textarea-editor rows="5"></textarea-editor></form-item>
+        </form-items>
+      </kendo-form>
+    </div>
+  </pane>
+
+  <pane collapsible="true" resizable="true" id="rightPane">
+    <kendo-panelbar name="vertical" expand-mode="single">
+      <items>
+      </items>
+    </kendo-panelbar>
+  </pane>
+</kendo-splitter>
+
+
+@section Scripts {
+  <script type="text/javascript">
+
+  </script>
+}

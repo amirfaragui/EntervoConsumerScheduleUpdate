@@ -1,0 +1,24 @@
+﻿@page
+@model Enable2faModel
+@{
+    ViewData["Title"] = "Enable two-factor authentication (2FA)";
+    ViewData["ActivePage"] = "Account|TwoFactorAuthentication";
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<h3>@ViewData["Title"]</h3>
+
+<div class="alert alert-warning" role="alert">
+    <p>
+        <strong>This action will enable 2FA.</strong>
+    </p>
+    <p>
+        Once two factor authentication is enabled, you will be asked to provider additional verification code every time you login.
+    </p>
+</div>
+
+<div>
+    <form method="post">
+        <button class="btn btn-success" type="submit">Enable 2FA</button>
+    </form>
+</div>

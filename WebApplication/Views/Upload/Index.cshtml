@@ -1,0 +1,149 @@
+﻿@{
+  ViewData["Title"] = "Upload";
+  ViewData["ActivePage"] = "Cards|Upload";
+}
+@model UploadModel
+
+<style>
+  .k-widget .k-stepper {
+    display: none;
+  }
+
+  .k-wizard-buttons-right button {
+    width: 90px;
+  }
+</style>
+
+<h3>Manual file upload</h3>
+
+@(
+Html.Kendo().Wizard()
+  .Name("wizard")
+  .LoadOnDemand(true)
+  .ReloadOnSelect(true)
+  .Steps(steps =>
+  {
+    steps.Add().Title("Source File").ContentUrl(Url.Action("upload", "upload"))
+      .Buttons(b => b.Next());
+
+    steps.Add<UploadModel>().Title("Options").Form(f => f
+        .FormData(Model)
+        .Validatable(v =>
+        {
+          v.ValidateOnBlur(true);
+          v.ValidationSummary(vs => vs.Enable(false));
+        })
+        .Items(items =>
+        {
+          items.Add().Field(m => m.FileName).Editor(e => e.TextBox().Readonly(true));
+          items.Add().Field(m => m.UploadId).Editor(e => e.Hidden());
+          items.Add().Field(m => m.FirstLineHeader).Editor(e => e.Switch());
+          items.Add().Field(m => m.Delimiter).Editor(e => e.DropDownList()
+            .Items(l =>
+            {
+              l.Add().Value(",").Text("comma");
+              l.Add().Value(";").Text("semi-colon");
+              l.Add().Value("\t").Text("tab");
+            }));
+
+        })
+    )
+    .Enabled(false)
+    .Buttons(b =>
+    {
+      b.Previous();
+      b.Done();
+    });
+
+  })
+  .Pager(false)
+  .ContentPosition(WizardContentPosition.Right)
+  .Events(events => events.Done("onDone"))
+)
+
+@(Html.Kendo().Notification().Name("error")
+  .Animation(animation =>
+  {
+    animation.Open(open => open.SlideIn(SlideDirection.Left).Duration(AnimationDuration.Normal));
+    animation.Close(c => c.Fade(FadeDirection.Out).Duration(AnimationDuration.Slow));
+  })
+  .Position(postion => postion.Top(70))
+)
+
+@section Scripts {
+  <script type="text/javascript">
+    var done = false;
+
+    function onFileUploaded(e) {
+      if (e.operation === "upload") {
+        var wizard = $("#wizard").data("kendoWizard");
+        wizard.enableStep(1, true);
+        var model = wizard._steps[1].form._model;
+        model.UploadId = e.files[0].uid;
+        model.FileName = e.files[0].name;
+
+        wizard.next();
+        $("#FileName").val(e.files[0].name);
+        $("#UploadId").val(e.files[0].uid);
+      }
+    }
+
+    function onDone(e) {
+      var o = {};
+      o.FileName = e.forms[0]._model.FileName;
+      o.Delimiter = e.forms[0]._model.Delimiter;
+      o.FirstLineHeader = e.forms[0]._model.FirstLineHeader;
+      o.IsIncrementalUpdate = e.forms[0]._model.IsIncrementalUpdate;
+      o.UploadId = e.forms[0]._model.UploadId;
+
+      var url = '@Url.Action("process", "upload")';
+      $.post(url, o, function (data) {
+        if (data.Success === true) {
+          var href = new URL(window.location.href);
+          var baseURL =  `${href.protocol}//${href.host}`;
+          var request = new URL('@Url.Action("progress", "upload")', baseURL);
+          request.searchParams.append("jobId", encodeURIComponent(data.JobId));
+          done = true;
+          window.location.href = request.href;
+        }
+        else {
+          showError(data.Message);
+        }
+      })
+        .fail(function (e) {
+          var m = JSON.parse(e.responseText);
+          showError(m.error);
+        });
+    }
+
+
+    function getElementName(prefix, index) {
+      return `${prefix}_${index}`;
+    }
+
+    function showError(message) {
+      var popupNotification = $("#error").data("kendoNotification");
+      popupNotification.error(message);
+    }
+
+    $(function () {
+      window.addEventListener('beforeunload', onBeforeUnload);
+    });
+
+    function onBeforeUnload() {
+      if (!done) {
+        console.log("should delete file...");
+        var href = new URL(window.location.href);
+        var baseURL = `${href.protocol}//${href.host}`;
+        var url = new URL('@Url.Action("abort", "upload")', baseURL);
+
+        var wizard = $("#wizard").data("kendoWizard");
+        var model = wizard._steps[1].form._model;
+        url.searchParams.append("fileName", model.FileName);
+
+        $.post(url.href);
+      }
+      return null;
+    }
+  </script>
+}

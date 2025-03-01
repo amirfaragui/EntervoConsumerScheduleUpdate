@@ -1,0 +1,82 @@
+﻿@{
+  ViewData["Title"] = "Permits";
+  ViewData["ActivePage"] = "Permits|List";
+}
+@using T2Importer.DAL;
+<h3>Permits</h3>
+
+@(
+Html.Kendo().Grid<PermitWithCustomerName>()
+    .Name("grid")
+    .Columns(columns =>
+    {
+      columns.Bound(model => model.PermitNumber).Width(100);
+      columns.Bound(model => model.AccessGroup).Width(100);
+      columns.Bound(model => model.CustomerName).Width(100).ClientTemplate("<a target='_blank' href='" + Url.Action("edit", "customers") + "/#= PurchasingCustomer #'" + ">#= CustomerName #</a>");
+      columns.Bound(model => model.ExpirationDate).Width(120).Format("{0:yyyy/MM/dd}");
+      columns.Bound(model => model.PermitAmountDue).Width(100);
+      columns.Bound(model => model.RenewalStatus).Width(100);
+      columns.Bound(model => model.Comment).Width(150);
+
+      columns.Command(command =>
+      {
+        command.Custom("Details").Text("Details").Click("onDetails");
+        command.Destroy();
+      }).Width(80);
+    })
+    .ToolBar(toolbar =>
+    {
+      toolbar.Custom().ClientTemplate(
+          Html.Kendo().Template().AddComponent(c => c
+              .Button()
+              .Name("import")
+              .Content("Import")
+              .Icon("file-csv")
+              .HtmlAttributes(new { title = "Import" })
+              .Events(ev => ev.Click("onImport"))
+          ));
+      toolbar.Separator();
+      toolbar.Search();
+    })
+    .Pageable(p =>
+    {
+      p.Refresh(true);
+      p.PageSizes(new int[] { 100, 500 });
+    })
+    .Scrollable(scrollable => scrollable.Enabled(true).Height("calc(100vh - 310px)").Virtual(true))
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .DataSource(datasource => datasource
+    .Ajax().PageSize(100)
+      .Model(model =>
+      {
+        model.Id(o => o.PermitUID);
+      })
+      .Sort(sort => sort.Add(m => m.PermitNumber).Ascending())
+      .Read(read => read.Action("_ReadWithCustomer", "permits"))
+      .Destroy(destroy => destroy.Action("_destroy", "permits"))
+    )
+    .Resizable(resize => resize.Columns(true))
+    .Sortable(sort => sort.SortMode(GridSortMode.SingleColumn))
+    .Search(search => search
+      .Field(m => m.PermitNumber)
+      .Field(m => m.AccessGroup)
+      .Field(m => m.Comment)
+    )
+)
+
+@section Scripts {
+  <script type="text/javascript">
+    function onDetails(e) {
+      e.preventDefault();
+      var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+      var url = '@Url.Action("edit", "permits")/' + dataItem.PermitUID;
+      window.open(url, '_blank');
+    }
+
+    function onImport(e) {
+      e.preventDefault();  //prevents postback
+      var url = '@Url.Action("import", "permits")';
+      window.location = url;
+    }
+  </script>
+}

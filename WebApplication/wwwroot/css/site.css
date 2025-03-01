@@ -1,0 +1,110 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+.k-rpanel-left {
+  height: calc(100vh - 80px);
+  z-index: 100;
+}*
+
+.dash-head {
+  height: 80px;
+  background-color: #222;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+  .dash-head h1 {
+    color: white;
+    text-transform: uppercase;
+  }
+
+  .dash-head .k-rpanel-toggle {
+    /*position: absolute;*/
+    width: 40px;
+    height: 40px;
+    margin-left: 20px;
+  }
+
+.panel-wrap {
+  background-color: #f5f5f5;
+  border: 1px solid #e5e5e5;
+  position: relative;
+}
+
+#slidebar {
+  margin: 0;
+  padding: 20px 0 20px 20px;
+  vertical-align: top;   
+}
+
+
+#main-content {
+  margin: 0;
+  padding: 20px;
+  min-height: 580px;
+  vertical-align: top;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  height: calc(100vh - 80px);
+}
+
+ WIDGETS 
+.widget {
+  margin: 0 0 20px;
+  padding: 0;
+  background-color: #ffffff;
+  border: 1px solid #e7e7e7;
+  border-radius: 3px;
+}
+
+/*  .widget div {
+    padding: 10px;
+    min-height: 50px;
+  }*/
+
+  .widget h3 {
+    font-size: 12px;
+    padding: 8px 10px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #e7e7e7;
+  }
+
+    .widget h3 span {
+      float: right;
+    }
+
+      .widget h3 span:hover {
+        cursor: pointer;
+        background-color: #e7e7e7;
+        border-radius: 20px;
+      }
+
+.k-panelbar .k-group {
+  padding-left: 12px;
+}
+
+.form-inline {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+}
+
+@font-face {
+  font-family: "Digital-7";
+  src: url('../font/Digital-7.ttf');
+}

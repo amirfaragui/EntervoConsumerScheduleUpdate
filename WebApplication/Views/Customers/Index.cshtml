@@ -1,0 +1,106 @@
+﻿@{
+  ViewData["Title"] = "Customers";
+  ViewData["ActivePage"] = "Customers|List";
+}
+@using T2Importer.DAL;
+<h3>Customers</h3>
+
+@(
+Html.Kendo().Grid<Customer>()
+    .Name("grid")
+    .Columns(columns =>
+    {
+      columns.Bound(model => model.LastName).Width(100);      
+      columns.Bound(model => model.FirstName).Width(100);
+      columns.Bound(model => model.EmployeeID).Width(80);
+      columns.Bound(model => model.CustomerType).Width(100);
+      columns.Bound(model => model.GroupName).Width(100);
+      columns.Bound(model => model.AccountBalance).Width(80);
+      columns.Bound(model => model.Subclassification).Width(100);
+      columns.Bound(model => model.HomePhone).Width(100);
+      columns.Bound(model => model.WorkPhone).Width(100);
+      columns.Bound(model => model.OtherPhone).Width(100);
+
+      columns.Command(command =>
+      {
+        command.Custom("Details").Text("Details").Click("onDetails");
+        command.Destroy();
+      }).Width(120);
+    })
+    .ToolBar(toolbar =>
+    {
+      toolbar.Custom().ClientTemplate(
+          Html.Kendo().Template().AddComponent(c => c
+              .Button()
+              .Name("create")
+              .Content("Create")
+              .Icon("plus")
+              .HtmlAttributes(new { title = "Create" })
+              .Events(ev => ev.Click("onCreate"))
+          ));
+      toolbar.Custom().ClientTemplate(
+          Html.Kendo().Template().AddComponent(c => c
+              .Button()
+              .Name("import")
+              .Content("Import")
+              .Icon("file-csv")
+              .HtmlAttributes(new { title = "Import" })
+              .Events(ev => ev.Click("onImport"))
+          ));
+      toolbar.Separator();
+      toolbar.Search();
+    })    
+    .Pageable(p =>
+    {
+      p.Refresh(true);
+      p.PageSizes(new int[] { 100, 500 });
+    })
+    .Scrollable(scrollable => scrollable.Enabled(true).Height("calc(100vh - 310px)").Virtual(true))
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .DataSource(datasource => datasource
+    .Ajax().PageSize(100)
+      .Model(model =>
+      {
+        model.Id(o => o.CustomerUID);
+      })
+      .Sort(sort => sort.Add(m => m.FirstName).Ascending())
+      .Read(read => read.Action("_read", "customers"))
+      .Destroy(destroy => destroy.Action("_destroy", "customers"))
+    )
+    .Resizable(resize => resize.Columns(true))
+    .Sortable(sort => sort.SortMode(GridSortMode.SingleColumn))
+    .Search(search => search
+      .Field(m => m.EmployeeID)
+      .Field(m => m.FirstName)
+      .Field(m => m.Subclassification)
+      .Field(m => m.LastName)
+      .Field(m => m.HomePhone)
+      .Field(m => m.WorkPhone)
+      .Field(m => m.OtherPhone)
+      .Field(m => m.EmployeeID)
+    )
+)
+
+@section Scripts {
+  <script type="text/javascript">
+        function onCreate(e) {
+          e.preventDefault();
+          var url = '@Url.Action("create", "customers")';
+          window.open(url, '_blank');
+        }
+
+        function onDetails(e) {
+          e.preventDefault();
+          var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+          var url = '@Url.Action("edit", "customers")/' + dataItem.CustomerUID;
+          window.open(url, '_blank');
+        }
+
+        function onImport(e) {
+                e.preventDefault();  //prevents postback
+                var url = '@Url.Action("import", "customers")';
+                window.location = url;
+
+        }
+  </script>
+}

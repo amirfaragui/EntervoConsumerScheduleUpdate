@@ -1,0 +1,106 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using T2Importer.Identity
+@inject SignInManager<CustomerPortalUser> SignInManager
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@ViewData["Title"] - T2 Importer</title>
+  <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="~/lib/font-awesome/css/all.css" />
+  <link rel="stylesheet" href="~/lib/kendo-ui/styles/default-ocean-blue.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@@progress/kendo-font-icons/dist/index.css" />
+
+  <script src="~/lib/jquery/dist/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.4.0/jszip.js"></script>
+
+  <script src="~/lib/kendo-ui/js/kendo.all.min.js"></script>
+  <script src="~/lib/kendo-ui/js/kendo.aspnetmvc.min.js"></script>
+
+  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+  <header>
+  </header>
+
+  <div class="dash-head">
+    <!-- toggle button for responsive panel, hidden on large screens -->
+    <button class="k-rpanel-toggle"><span class="fa-solid fa-bars"></span></button>
+    <h1 class="m-2">S&amp;B Permit Management</h1>
+  </div>
+
+  @{
+    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+  }
+
+  <div class="panel-wrap">
+    @if (SignInManager.IsSignedIn(User) || true)
+    {
+      <kendo-responsivepanel name="slidebar" breakpoint="1000" orientation="left">
+        <div class="widget">
+          <partial name="_NaviPartial" />
+        </div>
+
+@*         <div class="widget">
+          <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            <button type="submit" class="btn btn-danger" style="width:100%;">Logout</button>
+          </form>
+        </div> *@
+      </kendo-responsivepanel>
+    }
+    else
+    {
+      <kendo-responsivepanel name="slidebar" breakpoint="1000" orientation="left">
+        <div id="menu-container" class="widget">
+          <kendo-panelbar name="menu" expand-mode="single">
+            <items>
+              <panelbar-item text="Account" expanded="true">
+                <items>
+                  <panelbar-item text="Login" href="/Identity/Account/Login" selected=@NavPages.IsLoginSelected(ViewContext)></panelbar-item>
+                  <panelbar-item text="Forgot password" href="/Identity/Account/ForgotPassword" selected=@NavPages.IsForgotPasswordSelected(ViewContext)></panelbar-item>
+                  <panelbar-item text="Register as a new user" href="/Identity/Account/Register" selected=@NavPages.IsRegisterSelected(ViewContext)></panelbar-item>
+                  <panelbar-item text="Resend email confirmation" href="/Identity/Account/ResendEmailConfirmation" selected=@NavPages.IsResendEmailConfirmationSelected(ViewContext)></panelbar-item>
+                </items>
+              </panelbar-item>
+
+              <panelbar-item text="Privacy" href="/Privacy" selected=@NavPages.IsPrivacySelected(ViewContext)></panelbar-item>
+            </items>
+          </kendo-panelbar>
+        </div>
+      </kendo-responsivepanel>
+    }
+
+    <div id="main-content">
+      <div class="widget">
+        <main role="main">
+          @RenderBody()
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @@media (max-width: 1000px) {
+      #slidebar {
+        background: #fff;
+        padding: 20px;
+        border-left: 1px solid #e5e5e5;
+        /* show sidebar in container, demo only*/
+        position: absolute;
+        top: 0;
+        bottom: 0;
+      }
+
+        #slidebar.k-rpanel-expanded {
+          box-shadow: 0 0 10px rgba(0,0,0,.3);
+        }
+    }
+  </style>
+
+  <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="~/js/site.js" asp-append-version="true"></script>
+  @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

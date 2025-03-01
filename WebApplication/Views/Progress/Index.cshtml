@@ -1,0 +1,184 @@
+﻿@model ImportJobDescriptor
+@{
+  ViewBag.Title = "Progress";
+}
+
+<script id="summary-template" type="text/x-kendo-template">
+  <div>
+    <table>
+      <tr>
+        <td class="key"><span>File :</span></td>
+        <td class="value"><span id="filename">@Model.Source.FileName</span></td>
+      </tr>
+      <tr>
+        <td class="key"><span>Total Records :</span></td>
+        <td class="value"><span id="total">@Model.TotalRecords</span></td>
+      </tr>
+      <tr>
+        <td class="key"><span>Processed :</span></td>
+        <td class="value"><span id="processed"></span></td>
+      </tr>
+      <tr>
+        <td class="key"><span>Success :</span></td>
+        <td class="value"><span id="succeed"></span></td>
+      </tr>
+      <tr>
+        <td class="key"><span>Failed :</span></td>
+        <td class="value"><span id="failed"></span></td>
+      </tr>
+    </table>
+  </div>
+</script>
+
+
+
+<style>
+  td.key span {
+    font-weight: bold;
+  }
+
+  td.value {
+    text-align: right;
+  }
+
+  tr {
+    height: 36px;
+  }
+
+  .console {
+    font-family: Courier;
+    color: #CCCCCC;
+    background: #000000;
+    border: 3px double #CCCCCC;
+    padding: 10px;
+    height: 100%;
+    overflow: auto;
+  }
+
+  span.record {
+    display: inline-block;
+    line-height: 20px;
+    white-space: nowrap;
+  }
+
+  span.succeed {
+    color: seagreen;
+    width: 90px;
+    display: inline-block;
+    font-weight: bold;
+  }
+
+  span.failed {
+    color: red;
+    width: 90px;
+    display: inline-block;
+    font-weight: bold;
+  }
+</style>
+
+<script id="progress-template" type="text/x-kendo-template">
+  @(Html.Kendo().ProgressBar()
+            .Name("progress")
+            .Max(Model.TotalRecords)
+            .Type(ProgressBarType.Value)
+            .Animation(false)
+            .ToClientTemplate()
+          )
+</script>
+
+<script id="console-template" type="text/x-kendo-template">
+  <div id="console" class="console">
+  </div>
+</script>
+
+<kendo-tilelayout name="tiles" columns="6" columns-width="300px" rows-height="50px" on-resize="onTileResize" resizable="true">
+  <containers>
+    <container body-template-id="summary-template" col-span="2" row-span="5">
+      <container-header text="Summary" />
+    </container>
+    <container body-template-id="progress-template" col-span="4" row-span="5">
+      <container-header text="Progress" />
+    </container>
+    <container body-template-id="console-template" col-span="6" row-span="15">
+      <container-header text="Console" />
+    </container>
+  </containers>
+</kendo-tilelayout>
+
+@section Scripts {
+  <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
+
+  <script type="text/javascript">
+    var hubConnectionId = "";
+
+    var progressFeed = new signalR.HubConnectionBuilder()
+      .withUrl("/importProgressHub")
+      .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Trace)
+      .build();
+
+    progressFeed.on("connectionEstablished", function (connectionId) {
+      console.log('importProgressHub connection established');
+      hubConnectionId = connectionId;
+      subscribeProgress();
+    });
+
+
+    function subscribeProgress() {
+      var urlParams = new URLSearchParams(window.location.search);
+      var jobId = urlParams.get('jobId');
+
+      progressFeed.stream("Progress", jobId)
+        .subscribe({
+          next: onStatusChanged,
+          complete: () => {
+          },
+          error: (err) => {
+            console.error(err);
+          }
+        });
+
+      let o = {
+        jobId: jobId,
+        hubConnection: hubConnectionId
+      };
+      $.post('@Url.Action("start", "progress")', o);
+    }
+
+    function onStatusChanged(e) {
+      var progress = $('#progress').data("kendoProgressBar");
+      progress.value(e.totalProcessed);
+      $('#processed').text(e.totalProcessed);
+      $('#succeed').text(e.succeed);
+      $('#failed').text(e.failed);
+
+      if (e.recordProcessed) {
+        //$('#console').append(`<span class="succeed">[SUCCEED]</span><span class="record">${e.record}</span><br/>`);
+      }
+      else {
+        $('#console').append(`<span class="failed">[FAILED ]</span><span class="record">${e.record}</span><br/>`);
+      }
+
+      var recordProcessed = parseInt(e.totalProcessed);
+      if (recordProcessed >= 500) {
+        $('#console').find('span:first').remove();
+      }      
+
+      var elem = document.getElementById('console');
+      elem.scrollTop = elem.scrollHeight;
+    }
+
+    $(function () {
+      progressFeed.start()
+        .catch(function (err) {
+          return console.error(err.toString());
+        });
+    });
+
+    function onTileResize(e) {
+      if (e.item) {
+        kendo.resize(e.item, true);
+      }
+    }
+  </script>
+}

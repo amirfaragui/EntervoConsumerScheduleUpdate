@@ -1,0 +1,75 @@
+﻿@model IEnumerable<ColumnMappingModel>
+@{
+  var mappings = ViewBag.Mappings as IEnumerable<SelectListItem>;
+}
+<style>
+  #mappings {
+    border: 0px;
+  }
+
+    #mappings .k-listview-content {
+      display: flex;
+      flex-direction: row;
+      overflow-x: auto;
+      overflow-y: hidden;
+      gap: 10px;
+      align-content: flex-start;
+      height: 300px;
+    }
+
+  tr{
+    margin-bottom: 6px;
+  }
+
+  td.item-title {
+    width: 80px;
+  }
+
+  td.item-data {
+    width: 300px;
+  }
+</style>
+
+<div>
+
+  @(Html.Kendo().ListView<ColumnMappingModel>()
+    .Name("mappings")
+    .BindTo(Model)
+    .TagName("div")
+    .ClientTemplateId("template")
+    )
+</div>
+
+<script type="text/x-kendo-template" id="template">
+  <div class="k-listview-item">
+      <div class="k-card" style="width: 20em; margin:6px">
+          <div class="k-card-header">
+              <h4 class="k-card-title">#= Name #</h4>
+          </div>
+          <div class="k-card-body">
+              <table>
+                <tr>
+                  <td class="item-title"><span>Value</span></td>
+                  <td class="item-data"><span>#= Value #</span></td>
+                </tr>
+                  <tr>
+                    <td class="item-title"><span>Destination</span></td>
+                    <td class="item-data">
+                      <select class="mapDropDownList" id="#=getElementName('Target', Index)#">
+  @foreach (var i in mappings)
+  {
+    <text><option value=@i.Value>@i.Text</option></text>
+  }
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                   <td class="item-title"><span>Format</span></td>
+                  <td class="item-data"><input class="mapFormat" id="#=getElementName('Format', Index)#"></td>
+                </tr>
+              </table>
+          </div>
+      </div>
+  </div>
+</script>
+
