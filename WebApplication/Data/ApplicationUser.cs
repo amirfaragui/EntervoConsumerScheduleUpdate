@@ -1,10 +1,10 @@
-﻿using T2Importer.DAL;
-using T2Importer.DAL.Attributes;
+﻿using Entrvo.DAL;
+using Entrvo.DAL.Attributes;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace T2Importer.Identity
+namespace Entrvo.Identity
 {
   public enum UserType : int
   {

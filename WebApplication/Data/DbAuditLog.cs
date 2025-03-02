@@ -1,10 +1,10 @@
-﻿using T2Importer.DAL.Attributes;
+﻿using Entrvo.DAL.Attributes;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace T2Importer.DAL
+namespace Entrvo.DAL
 {
   public enum AuditType
   {

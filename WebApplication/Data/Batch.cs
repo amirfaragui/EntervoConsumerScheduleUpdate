@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace T2Importer.DAL
+namespace Entrvo.DAL
 {
   public class Batch
   {

@@ -3,7 +3,7 @@ using Kendo.Mvc.UI;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using T2Importer.DAL;
+using Entrvo.DAL;
 using T2WebApplication.Services;
 
 namespace T2WebApplication.Controllers

@@ -1,10 +1,10 @@
-﻿using T2Importer.DAL;
+﻿using Entrvo.DAL;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-namespace T2Importer.Identity.EntityFramework
+namespace Entrvo.Identity.EntityFramework
 {
   public class UserStore<TUser, TUserLogin> : Microsoft.AspNetCore.Identity.EntityFrameworkCore.UserStore<TUser, ApplicationRole, ApplicationDbContext, Guid,
     IdentityUserClaim<Guid>, IdentityUserRole<Guid>, TUserLogin, IdentityUserToken<Guid>, IdentityRoleClaim<Guid>>

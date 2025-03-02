@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
-using T2Importer.DAL;
+using Entrvo.DAL;
 
 namespace T2WebApplication.Models
 {

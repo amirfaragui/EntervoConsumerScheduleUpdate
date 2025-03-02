@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using Newtonsoft.Json;
 using System.ComponentModel;
-using T2Importer.DAL;
+using Entrvo.DAL;
+using Entrvo.Api;
 
 namespace T2WebApplication.Services
 {
@@ -53,9 +54,14 @@ namespace T2WebApplication.Services
 
     public static IServiceCollection AddSettingsService(this IServiceCollection services)
     {
-      services.TryAddSingleton<ISettingsService, SettingsService>();
-      var descriptor = new ServiceDescriptor(typeof(ISettingsService), typeof(SettingsService), ServiceLifetime.Singleton);
-      services.Replace(descriptor);
+      //services.TryAddSingleton<ISettingsService, SettingsService>();
+      //var descriptor = new ServiceDescriptor(typeof(ISettingsService), typeof(SettingsService), ServiceLifetime.Singleton);
+      //services.Replace(descriptor);
+
+      services.AddSingleton<SettingsService>();
+      services.AddSingleton<IHostedService>(s => s.GetRequiredService<SettingsService>());
+      services.AddSingleton<ISettingsService>(s => s.GetRequiredService<SettingsService>());
+      services.AddSingleton<IApiSettingsProvider>(s => s.GetRequiredService<SettingsService>());
 
       return services;
     }

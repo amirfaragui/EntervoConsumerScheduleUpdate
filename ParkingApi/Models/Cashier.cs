@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace SnB.Models
+namespace Entrvo.Api.Models
 {
   public class Cashier
   {

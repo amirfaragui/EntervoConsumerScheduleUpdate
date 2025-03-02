@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
-namespace T2Importer.Identity
+namespace Entrvo.Identity
 {
 
   public abstract class ApplicationUserLogin : IdentityUserLogin<Guid>

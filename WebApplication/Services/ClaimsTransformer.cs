@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
-namespace T2Importer.Identity
+namespace Entrvo.Identity
 {
   public class ClaimsTransformer<TUser> : IClaimsTransformation where TUser : ApplicationUser
   {

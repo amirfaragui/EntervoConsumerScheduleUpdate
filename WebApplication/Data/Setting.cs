@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
-using T2Importer.DAL.Attributes;
+using Entrvo.DAL.Attributes;
 
-namespace T2Importer.DAL
+namespace Entrvo.DAL
 {
   public class Setting
   {

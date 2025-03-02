@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "T2WebApplication": {
+    "Entrvo": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "http://localhost:7000/upload",

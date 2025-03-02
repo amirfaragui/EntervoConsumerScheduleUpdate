@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Text;
 using System.Text.Encodings.Web;
-using T2Importer.Identity;
+using Entrvo.Identity;
 
 namespace T2WebApplication.Areas.Identity.Pages.Account.Manage
 {

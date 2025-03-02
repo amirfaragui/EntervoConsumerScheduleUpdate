@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Reflection;
 using T2WebApplication.Models;
 
-namespace T2Importer.DAL
+namespace Entrvo.DAL
 { 
   public interface IDataEntity
   {

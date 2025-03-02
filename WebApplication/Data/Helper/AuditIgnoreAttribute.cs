@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace T2Importer.DAL.Attributes
+namespace Entrvo.DAL.Attributes
 {
   [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
   public class AuditIgnoreAttribute: Attribute

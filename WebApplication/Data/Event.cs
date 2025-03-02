@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using T2Importer.DAL.Attributes;
+using Entrvo.DAL.Attributes;
 
-namespace T2Importer.DAL
+namespace Entrvo.DAL
 {
   public enum JobType
   {

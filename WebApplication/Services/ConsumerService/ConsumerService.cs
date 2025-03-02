@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Globalization;
-using T2Importer.DAL;
+using Entrvo.DAL;
+using Entrvo.Services;
 
 namespace T2WebApplication.Services
 {
@@ -12,7 +13,7 @@ namespace T2WebApplication.Services
   {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<ConsumerService> _logger;
-    private readonly IApiClient _client;
+    private readonly IParkingApi _client;
     private readonly ISettingsService _settingsService;
     private readonly IEmailService _emailService;
 
@@ -22,7 +23,7 @@ namespace T2WebApplication.Services
     public ConsumerService(ApplicationDbContext context,
                            IWebHostEnvironment hostingEnvironment,
                            ILogger<ConsumerService> logger,
-                           IApiClient client,
+                           IParkingApi client,
                            IEmailService emailService,
                            ISettingsService settingsService)
     {
@@ -61,14 +62,14 @@ namespace T2WebApplication.Services
 
 
         var settings = await _settingsService.LoadSettingsAsync();
-        await _client.Initialize();
+        //_client.Initialize();
 
         var count = 0;
-        await foreach (var c in _client.GetConsumerDetailsAsync(settings.Destination.ContractNumber, token))
+        await foreach (var c in _client.GetAllConsumerDetailsAsync(settings.Destination.ContractNumber, token))
         {
           if (string.IsNullOrWhiteSpace(c.Person.MatchCode) || c.Person.MatchCode == "Non-Payroll") continue;
 
-          var consumer = new T2Importer.DAL.Consumer()
+          var consumer = new Entrvo.DAL.Consumer()
           {
             LPN1 = c.Lpn1?.ToUpper(),
             LPN2 = c.Lpn2?.ToUpper(),
@@ -137,7 +138,7 @@ namespace T2WebApplication.Services
         var settings = await _settingsService.LoadSettingsAsync();
         var url = settings.Destination.Server.Replace("https", "http");
 
-        await _client.Initialize();
+        //await _client.Initialize();
 
         var sw = new Stopwatch();
         _logger.LogInformation("Start to push consumers to server...");
@@ -160,7 +161,7 @@ namespace T2WebApplication.Services
         {
           //if (item.u.ClientRef != "229931") continue;
 
-          var c = await _client.GetConsumerAsync(item.u.ContractId, item.u.ConsumerId);
+          var c = await _client.GetConsumerDetailsAsync(item.u.ContractId, item.u.ConsumerId);
 
           if (item.p == null)
           {

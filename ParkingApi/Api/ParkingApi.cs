@@ -1,55 +1,51 @@
-﻿using Newtonsoft.Json;
+﻿using Entrvo.Api;
+using Entrvo.Api.Models;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Authenticators;
 using RestSharp.Serializers.NewtonsoftJson;
 using RestSharp.Serializers.Xml;
-using SnB.Models;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace T2WebApplication.Services
+namespace Entrvo.Services
 {
   //Test Url: "https://209.151.135.7:8443",
   //Username: "104",
   //Password: "4711Abcd"
-  public class ApiClient : IApiClient
+  public class ParkingApi : IParkingApi
   {
-    private readonly ILogger<ApiClient> _logger;
-    private readonly ISettingsService _settingsService;
+    private readonly ILogger<ParkingApi> _logger;
+    private readonly IApiSettingsProvider _settingsProvider;
 
     private RestClient _client;
 
 
-    public ApiClient(ILogger<ApiClient> logger,
-                     ISettingsService settingsService)
+    public ParkingApi(ILogger<ParkingApi> logger,
+                     IApiSettingsProvider settingsProvider)
     {
       _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-      _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+      _settingsProvider = settingsProvider ?? throw new ArgumentNullException(nameof(settingsProvider));
+
+      var options = settingsProvider.GetApiOptions();
+      Initialize(options);
     }
 
 
-    public async Task Initialize(string? url = null, Credential? credential = null)
+    public void Initialize(ApiOptions options)
     {
-      if (string.IsNullOrEmpty(url))
-      {
-        var settings = await _settingsService.LoadSettingsAsync();
-        url = settings.Destination.Server;
-      }
-
-      if (credential != null)
-      {
-        _client = CreateClinet(url, new HttpBasicAuthenticator(credential.Username, credential.Password));
-      }
-      else
-      {
-        var settings = await _settingsService.LoadSettingsAsync();
-        _client = CreateClinet(settings.Destination.Server,
-          new HttpBasicAuthenticator(settings.Destination.UserName, settings.Destination.Password));
-      }
+      _client = CreateClinet(options.Server, new HttpBasicAuthenticator(options.Username, options.Password));
     }
 
     private RestClient CreateClinet(string url, IAuthenticator authenticator)
@@ -71,16 +67,68 @@ namespace T2WebApplication.Services
     }
 
     #region Consumers
-    public IObservable<ConsumerDetail> GetConsumerDetails(int? contractId, CancellationToken cancellationToken = default)
-    {
-      var subject = new Subject<ConsumerDetail>();
-      Task.Run(() => GetConsumerDetailsTask(contractId, subject, cancellationToken));
-      return subject;
-    }
+    //public IObservable<ConsumerDetail> GetConsumerDetails(int? contractId, CancellationToken cancellationToken = default)
+    //{
+    //  var subject = new Subject<ConsumerDetail>();
+    //  Task.Run(() => GetConsumerDetailsTask(contractId, subject, cancellationToken));
+    //  return subject;
+    //}
 
-    public IAsyncEnumerable<ConsumerDetail> GetConsumerDetailsAsync(int? contractId, CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<ConsumerDetails> GetAllConsumerDetailsAsync(int? contractId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-      return GetConsumerDetails(contractId, cancellationToken).ToAsyncEnumerable();
+      var request = new RestRequest("CustomerMediaWebService/consumers");
+      if (contractId.HasValue)
+      {
+        var cid = contractId.Value.ToString();
+        request.AddQueryParameter("minContractId", cid);
+        request.AddQueryParameter("maxContractId", cid);
+      }
+      request.AddHeader("Accept", "application/json");
+      request.Method = Method.Get;
+
+      var transformBlock = new TransformBlock<Consumer, ConsumerDetails>(async c =>
+      {
+        var details = await GetConsumerDetailsAsync(c.ContractId, c.Id, cancellationToken);
+        return details;
+      }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 8 });
+
+      IEnumerable<Consumer> consumers = null;
+
+      try
+      {
+        var response = await _client.ExecuteGetAsync(request, cancellationToken);
+        _logger.LogDebug(response.Content);
+
+        try
+        {
+          var result = JsonConvert.DeserializeObject<ConsumerListResponse>(response.Content);
+          consumers = result.Consumers.Consumers;
+        }
+        catch (JsonSerializationException)
+        {
+          var result = JsonConvert.DeserializeObject<SingleConsumerResponse>(response.Content);
+          consumers = result.Consumers.Consumers;
+        }
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex.ToString());
+        throw;
+      }
+
+      foreach (var c in consumers)
+      {
+        transformBlock.Post(c);
+      }
+      transformBlock.Complete();
+      await transformBlock.Completion;
+      while (await transformBlock.OutputAvailableAsync())
+      {
+        while (transformBlock.TryReceive(out var result))
+        {
+          if (result != null) yield return result;
+        }
+      }
     }
 
     private async IAsyncEnumerable<Consumer> GetConsumers(int? contractId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -94,7 +142,7 @@ namespace T2WebApplication.Services
       }
       request.AddHeader("Accept", "application/json");
 
-      var consumers = await _client.GetAsync<IEnumerable<Consumer>>(request, cancellationToken);
+      var consumers = await _client.GetAsync<Consumer[]>(request, cancellationToken);
 
       foreach (var c in consumers)
       {
@@ -102,7 +150,7 @@ namespace T2WebApplication.Services
       }
     }
 
-    private async Task GetConsumerDetailsTask(int? contractId, Subject<ConsumerDetail> subject, CancellationToken cancellationToken)
+    private async Task GetConsumerDetailsTask(int? contractId, Subject<ConsumerDetails> subject, CancellationToken cancellationToken)
     {
       try
       {
@@ -118,7 +166,7 @@ namespace T2WebApplication.Services
 
         var getBlock = new ActionBlock<Consumer>(async c =>
         {
-          var details = await GetConsumerAsync(c.ContractId, c.Id, cancellationToken);
+          var details = await GetConsumerDetailsAsync(c.ContractId, c.Id, cancellationToken);
           if (details != null)
           {
             subject.OnNext(details);
@@ -155,7 +203,7 @@ namespace T2WebApplication.Services
     #endregion
 
     #region Cashier
-    public async Task<IEnumerable<Cashier>> GetCashiersAsync(CancellationToken cancellationToken = default)
+    public async Task<Cashier[]> GetCashiersAsync(CancellationToken cancellationToken = default)
     {
       try
       {
@@ -175,7 +223,7 @@ namespace T2WebApplication.Services
           return result.Cashiers;
         }
 
-        throw new HttpRequestException() { HResult = (int)response.StatusCode };
+        throw new ApiErrorException("Failed to get the cashier.") { StutusCode = response.StatusCode };
       }
       catch (Exception ex)
       {
@@ -222,7 +270,7 @@ namespace T2WebApplication.Services
 
         }
 
-        throw new HttpRequestException() { HResult = (int)response.StatusCode };
+        throw new ApiErrorException("Failed to get active shift.") { StutusCode = response.StatusCode };
       }
       catch (Exception ex)
       {
@@ -268,7 +316,7 @@ namespace T2WebApplication.Services
         }
         catch (JsonSerializationException)
         {
-          throw new HttpRequestException() { HResult = (int)response.StatusCode };
+          throw new ApiErrorException("Failed to create shift.") { StutusCode = response.StatusCode };
         }
       }
       catch (Exception ex)
@@ -280,7 +328,7 @@ namespace T2WebApplication.Services
     #endregion
 
     #region Device
-    public async Task<IEnumerable<Device>> GetDevicesAsync(CancellationToken cancellationToken = default)
+    public async Task<Device[]> GetDevicesAsync(CancellationToken cancellationToken = default)
     {
       try
       {
@@ -337,9 +385,9 @@ namespace T2WebApplication.Services
           var error = JsonConvert.DeserializeObject<ErrorResponse>(response.Content);
           throw new ApiErrorException(error.Error) { StutusCode = response.StatusCode };
         }
-        catch (JsonSerializationException)
+        catch (JsonSerializationException ex)
         {
-          throw new HttpRequestException() { HResult = (int)response.StatusCode };
+          throw new ApiErrorException(ex.Message) { StutusCode = response.StatusCode };
         }
       }
       catch (Exception ex)
@@ -350,7 +398,7 @@ namespace T2WebApplication.Services
 
     }
 
-    public async Task<ConsumerDetail?> GetConsumerAsync(string contractId, string consumerId, CancellationToken cancellationToken = default)
+    public async Task<ConsumerDetails?> GetConsumerDetailsAsync(string contractId, string consumerId, CancellationToken cancellationToken = default)
     {
       try
       {
@@ -378,7 +426,7 @@ namespace T2WebApplication.Services
     }
 
 
-    public async Task<bool> UpdateConsumerAsync(ConsumerDetail consumer, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateConsumerAsync(ConsumerDetails consumer, CancellationToken cancellationToken = default)
     {
       try
       {

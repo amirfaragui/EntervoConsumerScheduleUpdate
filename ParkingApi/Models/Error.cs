@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Net;
 
-namespace SnB.Models
+namespace Entrvo.Api.Models
 {
   public class Error
   {
@@ -26,6 +27,14 @@ namespace SnB.Models
     public ApiErrorException(Error error) : base(error.Message)
     {
       Error = error;
+    }
+
+    public ApiErrorException(string mesage) : base(mesage)
+    {
+      Error = new Error
+      {
+        Message = mesage
+      };
     }
   }
 }

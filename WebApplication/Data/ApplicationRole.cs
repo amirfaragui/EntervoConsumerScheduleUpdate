@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace T2Importer.Identity
+namespace Entrvo.Identity
 {
   public class ApplicationRole: IdentityRole<Guid>
   {

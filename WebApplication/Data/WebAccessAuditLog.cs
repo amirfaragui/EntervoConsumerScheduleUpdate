@@ -1,8 +1,8 @@
-﻿using T2Importer.DAL.Attributes;
+﻿using Entrvo.DAL.Attributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace T2Importer.DAL
+namespace Entrvo.DAL
 {
   [AuditIgnore]
   public class WebAccessAuditLog

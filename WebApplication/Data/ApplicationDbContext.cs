@@ -1,12 +1,12 @@
-﻿using T2Importer.DAL.Attributes;
-using T2Importer.Identity;
+﻿using Entrvo.DAL.Attributes;
+using Entrvo.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 #nullable disable
 
-namespace T2Importer.DAL
+namespace Entrvo.DAL
 {
   public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid, IdentityUserClaim<Guid>, IdentityUserRole<Guid>, ApplicationUserLogin, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
   {

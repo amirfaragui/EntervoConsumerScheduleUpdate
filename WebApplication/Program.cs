@@ -10,13 +10,14 @@ using Newtonsoft.Json.Serialization;
 using Serilog;
 using Serilog.Settings.Configuration;
 using System.Globalization;
-using T2Importer.DAL;
-using T2Importer.Identity;
-using T2Importer.Identity.EntityFramework;
+using Entrvo.DAL;
+using Entrvo.Identity;
+using Entrvo.Identity.EntityFramework;
 using T2WebApplication;
 using T2WebApplication.Hubs;
 using T2WebApplication.Identity;
 using T2WebApplication.Services;
+using Entrvo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -123,11 +124,12 @@ builder.Services.Configure<CookieTempDataProviderOptions>(options =>
 builder.Services.AddHealthChecks();
 builder.Services.ConfigureHttpsRedirection(builder.Configuration.GetSection("HttpServer:Endpoints"));
 
-builder.Services.AddTransient<IApiClient, ApiClient>();
 builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformer<CustomerPortalUser>>();
 builder.Services.AddTransient<ITransformService, TransformService>();
 builder.Services.AddTransient<IConsumerService, ConsumerService>();
 builder.Services.AddTransient<IFtpDownloadService, FtpDownloadService>();
+
+builder.Services.AddScoped<IParkingApi, ParkingApi>();
 
 builder.Services.AddSingleton<IImportingService, ImportingService>();
 

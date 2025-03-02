@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SnB.Models;
+﻿using Entrvo.Api;
+using Entrvo.Services;
+using Microsoft.AspNetCore.Mvc;
 using T2WebApplication.Models;
 using T2WebApplication.Services;
 
@@ -28,11 +29,17 @@ namespace T2WebApplication.Controllers
       return View(model);
     }
 
-    public async Task<IActionResult> UpdateConnection(ApiDestinationEditModel model, [FromServices]IApiClient client)
+    public async Task<IActionResult> UpdateConnection(ApiDestinationEditModel model, [FromServices]IParkingApi client)
     {
       try
       {
-        await client.Initialize(model.Server, new Credential() { Username = model.UserName, Password = model.Password });
+        var options = new ApiOptions()
+        {
+          Server = model.Server,
+          Username = model.UserName,
+          Password = model.Password
+        };
+        client.Initialize(options);
 
         var devices = await client.GetDevicesAsync();
 

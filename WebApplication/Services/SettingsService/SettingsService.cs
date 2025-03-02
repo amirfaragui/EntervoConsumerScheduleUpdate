@@ -1,13 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Entrvo.Api;
+using Entrvo.DAL;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using NuGet.Configuration;
-using T2Importer.DAL;
 using T2WebApplication.Models;
-using Telerik.SvgIcons;
 
 namespace T2WebApplication.Services
 {
-  public class SettingsService : ISettingsService
+  public class SettingsService : BackgroundService, ISettingsService, IApiSettingsProvider
   {
     private readonly IMemoryCache _memoryCache;
     private readonly ILogger<SettingsService> _logger;
@@ -70,7 +69,7 @@ namespace T2WebApplication.Services
       model.IsConsumerDatabaseInitialized = settings.GetValue<bool>(SB_DatabaseInitializedKey);
 
       var options = new MemoryCacheEntryOptions().SetPriority(CacheItemPriority.NeverRemove);
-      _memoryCache.Set("valet-settings", model, options);
+      _memoryCache.Set("t2-settings", model, options);
 
       return model;
     }
@@ -249,6 +248,22 @@ namespace T2WebApplication.Services
 
       var options = new MemoryCacheEntryOptions().SetPriority(CacheItemPriority.NeverRemove);
       _memoryCache.Set("t2-settings", cached, options);
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+      await LoadSettingsAsync();
+    }
+
+    ApiOptions IApiSettingsProvider.GetApiOptions()
+    {
+      var settings = LoadSettingsAsync().Result;
+      return new ApiOptions()
+      {
+        Server = settings.Destination.Server,
+        Username = settings.Destination.UserName,
+        Password = settings.Destination.Password,
+      };
     }
   }
 }

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
-using T2Importer.Identity;
+using Entrvo.Identity;
 
 namespace T2WebApplication.Areas.Identity.Pages.Account
 {

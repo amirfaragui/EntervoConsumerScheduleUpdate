@@ -3,7 +3,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using T2Importer.Identity;
+using Entrvo.Identity;
 
 namespace T2WebApplication.Areas.Identity.Pages.Account.Manage
 {
