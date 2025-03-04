@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Entrvo.DAL;
-using T2WebApplication.Models;
+using Entrvo.Models;
 
-namespace T2WebApplication.Controllers
+namespace Entrvo.Controllers
 {
   public class HistoryController : Controller
   {

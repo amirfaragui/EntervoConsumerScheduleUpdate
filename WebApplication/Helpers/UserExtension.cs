@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace T2WebApplication
+namespace Entrvo
 {
   static class UserExtension
   {

@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System.Threading.Channels;
-using T2WebApplication.Models;
-using T2WebApplication.Services;
-using T2WebApplication.Services.Models;
+using Entrvo.Models;
+using Entrvo.Services;
+using Entrvo.Services.Models;
 
-namespace T2WebApplication.Hubs
+namespace Entrvo.Hubs
 {
   public class ProgressHub : Hub
   {

@@ -7,7 +7,7 @@ using System.Globalization;
 using Entrvo.DAL;
 using Entrvo.Services;
 
-namespace T2WebApplication.Services
+namespace Entrvo.Services
 {
   public class ConsumerService : IConsumerService
   {
@@ -60,12 +60,16 @@ namespace T2WebApplication.Services
         var records = await _context.Database.ExecuteSqlRawAsync("DELETE FROM Consumers");
         _logger.LogInformation($"Total {records} record(s) deleted.");
 
-
         var settings = await _settingsService.LoadSettingsAsync();
-        //_client.Initialize();
 
         var count = 0;
-        await foreach (var c in _client.GetAllConsumerDetailsAsync(settings.Destination.ContractNumber, token))
+        var filter = new Dictionary<ConsumerFilter, object>
+        {
+          { ConsumerFilter.MinContractId, settings.Destination.ContractNumber },
+          { ConsumerFilter.MaxContractId, settings.Destination.ContractNumber },
+          { ConsumerFilter.Cardno, "123400000005" }
+        };
+        await foreach (var c in _client.FindConsumerDetailssAsync(filter, token))
         {
           if (string.IsNullOrWhiteSpace(c.Person.MatchCode) || c.Person.MatchCode == "Non-Payroll") continue;
 

@@ -1,7 +1,7 @@
 ﻿using MQTTnet.Protocol;
 using MQTTnet.Server;
 
-namespace T2WebApplication.Services
+namespace Entrvo.Services
 {
   public interface IRpcPayload
   {

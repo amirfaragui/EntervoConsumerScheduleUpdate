@@ -7,6 +7,28 @@ using System.Threading.Tasks;
 
 namespace Entrvo.Services
 {
+
+  public enum ConsumerFilter
+  {
+    MinContractId,
+    MaxContractId,
+    MinId,
+    MaxId,
+    ValidFromConsumer,
+    ValidUntilConsumer,
+    ValidFromContract,
+    ValidUntilContract,
+    Status,
+    Delete,
+    Lpn1,
+    Lpn2,
+    Lpn3,
+    Cardno,
+    Name,
+    IgnorePresentce,
+    InstanceId,
+  }
+
   public interface IParkingApi
   {
     void Initialize(ApiOptions options);
@@ -19,10 +41,14 @@ namespace Entrvo.Services
 
 
     //IObservable<ConsumerDetail> GetConsumerDetails(int? contractId, CancellationToken cancellationToken = default);
-    IAsyncEnumerable<ConsumerDetails> GetAllConsumerDetailsAsync(int? contractId, [EnumeratorCancellation] CancellationToken cancellationToken = default);
+    //IAsyncEnumerable<ConsumerDetails> GetAllConsumerDetailsAsync(int? contractId, [EnumeratorCancellation] CancellationToken cancellationToken = default);
     Task<ConsumerDetails?> GetConsumerDetailsAsync(string contractId, string consumerId, CancellationToken cancellationToken = default);
 
+    IAsyncEnumerable<Consumer> FindConsumersAsync(IDictionary<ConsumerFilter, object> filters, CancellationToken cancellationToken = default);
 
+    IAsyncEnumerable<ConsumerDetails> FindConsumerDetailssAsync(IDictionary<ConsumerFilter, object> filters, CancellationToken cancellationToken = default);
+
+    Task<int> CreateConsumerAsync(ConsumerDetails consumer, CancellationToken cancellationToken = default);
 
     Task<bool> UpdateConsumerAsync(ConsumerDetails consumer, CancellationToken cancellationToken = default);
   }

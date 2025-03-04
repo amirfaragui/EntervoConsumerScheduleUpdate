@@ -5,7 +5,7 @@
 using System;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace T2WebApplication.Views
+namespace Entrvo.Views
 {
   /// <summary>
   ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -144,6 +144,15 @@ namespace T2WebApplication.Views
       var parts = activePage.Split('|');
       if (parts.Length < 2) return false;
       return string.Equals(parts[1], "Destination", StringComparison.OrdinalIgnoreCase) ? true : false;
+    }
+
+    public static bool IsDataFoldersSelected(ViewContext viewContext)
+    {
+      var activePage = viewContext.ViewData["ActivePage"] as string
+          ?? Path.GetFileNameWithoutExtension(viewContext.ActionDescriptor.DisplayName);
+      var parts = activePage.Split('|');
+      if (parts.Length < 2) return false;
+      return string.Equals(parts[1], "DataFolders", StringComparison.OrdinalIgnoreCase) ? true : false;
     }
     // Account
     public static bool IsAccountExpanded(ViewContext viewContext)

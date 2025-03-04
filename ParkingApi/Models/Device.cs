@@ -10,7 +10,7 @@ namespace Entrvo.Api.Models
     public string DeviceLongName { get; set; }
   }
 
-  class DeviceListResponse
+  public class DeviceListResponse
   {
     [JsonProperty("device")]
     public Device[] Devices { get; set; }

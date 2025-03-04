@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using Entrvo.Identity;
 
-namespace T2WebApplication.Areas.Identity.Pages.Account
+namespace Entrvo.Areas.Identity.Pages.Account
 {
   public class LoginWithRecoveryCodeModel : PageModel
     {

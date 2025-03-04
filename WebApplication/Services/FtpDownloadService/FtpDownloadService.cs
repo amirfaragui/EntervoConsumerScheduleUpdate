@@ -7,10 +7,10 @@ using System.Diagnostics.Tracing;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Entrvo.DAL;
-using T2WebApplication.Models;
-using T2WebApplication.Services.Models;
+using Entrvo.Models;
+using Entrvo.Services.Models;
 
-namespace T2WebApplication.Services
+namespace Entrvo.Services
 {
   //host = @"sftpflex.t2hosted.ca";
   //username = "UHNftp";

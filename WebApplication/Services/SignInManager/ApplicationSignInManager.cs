@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 
-namespace T2WebApplication.Identity
+namespace Entrvo.Identity
 {
   public class ApplicationSignInManager : SignInManager<CustomerPortalUser>
   {

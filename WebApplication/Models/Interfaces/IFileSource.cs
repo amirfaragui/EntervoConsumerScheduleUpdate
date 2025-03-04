@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace T2WebApplication.Models
+namespace Entrvo.Models
 {
   public interface IFileSource
   {

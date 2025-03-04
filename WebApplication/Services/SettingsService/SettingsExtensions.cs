@@ -4,7 +4,7 @@ using System.ComponentModel;
 using Entrvo.DAL;
 using Entrvo.Api;
 
-namespace T2WebApplication.Services
+namespace Entrvo.Services
 {
 
   static class SettingsExtension

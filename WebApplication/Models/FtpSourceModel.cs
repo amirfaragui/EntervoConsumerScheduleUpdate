@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace T2WebApplication.Models
+namespace Entrvo.Models
 {
   public class FtpSourceModel: IRemoteCredential
   {

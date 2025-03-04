@@ -8,7 +8,7 @@ using Newtonsoft.Json.Serialization;
 using System.Text;
 using System.Threading.Channels;
 
-namespace T2WebApplication.Hubs
+namespace Entrvo.Hubs
 {
   public abstract class MqttBaseHub<T>: Hub<IConnectionEstablished> where T: class
   {

@@ -5,10 +5,10 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading.Channels;
 using Entrvo.DAL;
-using T2WebApplication.Models;
-using T2WebApplication.Services.Models;
+using Entrvo.Models;
+using Entrvo.Services.Models;
 
-namespace T2WebApplication.Services
+namespace Entrvo.Services
 {
   public class TransformService : ITransformService
   {

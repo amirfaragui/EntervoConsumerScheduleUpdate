@@ -9,7 +9,7 @@ namespace Entrvo.Api.Models
     public string Surname { get; set; }
   }
 
-  class CashierListResponse
+  public class CashierListResponse
   {
     [JsonProperty("cashier")]
     public Cashier[] Cashiers { get; set; }

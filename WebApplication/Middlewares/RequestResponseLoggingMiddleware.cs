@@ -3,7 +3,7 @@ using Microsoft.IO;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace T2WebApplication
+namespace Entrvo
 {
   public class RequestResponseLoggingMiddleware
   {

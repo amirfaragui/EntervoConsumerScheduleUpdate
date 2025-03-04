@@ -1,4 +1,4 @@
-﻿namespace T2WebApplication.Services
+﻿namespace Entrvo.Services
 {
   public interface IConsumerService
   {

@@ -8,7 +8,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using System.Text;
 
-namespace T2WebApplication.Services
+namespace Entrvo.Services
 {
   public class MqttService : IMqttService
   {

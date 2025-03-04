@@ -8,6 +8,7 @@ using RestSharp.Serializers.NewtonsoftJson;
 using RestSharp.Serializers.Xml;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Reactive.Subjects;
@@ -22,8 +23,8 @@ using System.Xml.Serialization;
 namespace Entrvo.Services
 {
   //Test Url: "https://209.151.135.7:8443",
-  //Username: "104",
-  //Password: "4711Abcd"
+  //Username: "799",
+  //Password: "S&Bca@4711"
   public class ParkingApi : IParkingApi
   {
     private readonly ILogger<ParkingApi> _logger;
@@ -67,38 +68,51 @@ namespace Entrvo.Services
     }
 
     #region Consumers
-    //public IObservable<ConsumerDetail> GetConsumerDetails(int? contractId, CancellationToken cancellationToken = default)
-    //{
-    //  var subject = new Subject<ConsumerDetail>();
-    //  Task.Run(() => GetConsumerDetailsTask(contractId, subject, cancellationToken));
-    //  return subject;
-    //}
-
-    public async IAsyncEnumerable<ConsumerDetails> GetAllConsumerDetailsAsync(int? contractId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    private RestRequest GenerateConsumerRequest(string resource, IDictionary<ConsumerFilter, object> filters)
     {
-      var request = new RestRequest("CustomerMediaWebService/consumers");
-      if (contractId.HasValue)
+      var request = new RestRequest(resource)
       {
-        var cid = contractId.Value.ToString();
-        request.AddQueryParameter("minContractId", cid);
-        request.AddQueryParameter("maxContractId", cid);
-      }
+        Method = Method.Get
+      };
       request.AddHeader("Accept", "application/json");
-      request.Method = Method.Get;
 
-      var transformBlock = new TransformBlock<Consumer, ConsumerDetails>(async c =>
+      foreach (var filter in filters)
       {
-        var details = await GetConsumerDetailsAsync(c.ContractId, c.Id, cancellationToken);
-        return details;
-      }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 8 });
+        var key = filter.Key.ToString();
+        key = char.ToLower(key[0]) + key.Substring(1);
+        var type = filter.Value.GetType();
+
+        if (type == typeof(int))
+        {
+          request.AddQueryParameter(key, filter.Value.ToString());
+        }
+        else if (type == typeof(string))
+        {
+          request.AddQueryParameter(key, filter.Value.ToString());
+        }
+        else if (type == typeof(DateTime))
+        {
+          request.AddQueryParameter(key, ((DateTime)filter.Value).ToString("yyyy-MM-dd"));
+        }
+        else
+        {
+          throw new ArgumentException($"Invalid filter value type: {type}");
+        }
+      }
+
+      return request;
+    }
+
+    public async IAsyncEnumerable<Consumer> FindConsumersAsync(IDictionary<ConsumerFilter, object> filters, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+      var request = GenerateConsumerRequest("CustomerMediaWebService/consumers", filters);
 
       IEnumerable<Consumer> consumers = null;
 
       try
       {
         var response = await _client.ExecuteGetAsync(request, cancellationToken);
-        _logger.LogDebug(response.Content);
-
+        if (response.StatusCode ==  System.Net.HttpStatusCode.NoContent) yield break;
         try
         {
           var result = JsonConvert.DeserializeObject<ConsumerListResponse>(response.Content);
@@ -118,88 +132,106 @@ namespace Entrvo.Services
 
       foreach (var c in consumers)
       {
-        transformBlock.Post(c);
-      }
-      transformBlock.Complete();
-      await transformBlock.Completion;
-      while (await transformBlock.OutputAvailableAsync())
-      {
-        while (transformBlock.TryReceive(out var result))
-        {
-          if (result != null) yield return result;
-        }
-      }
-    }
-
-    private async IAsyncEnumerable<Consumer> GetConsumers(int? contractId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
-    {
-      var request = new RestRequest("CustomerMediaWebService/consumers");
-      if (contractId.HasValue)
-      {
-        var cid = contractId.Value.ToString();
-        request.AddQueryParameter("minContractId", cid);
-        request.AddQueryParameter("maxContractId", cid);
-      }
-      request.AddHeader("Accept", "application/json");
-
-      var consumers = await _client.GetAsync<Consumer[]>(request, cancellationToken);
-
-      foreach (var c in consumers)
-      {
         yield return c;
       }
     }
 
-    private async Task GetConsumerDetailsTask(int? contractId, Subject<ConsumerDetails> subject, CancellationToken cancellationToken)
+    public async IAsyncEnumerable<ConsumerDetails> FindConsumerDetailssAsync(IDictionary<ConsumerFilter, object> filters, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+      var transformBlock = new TransformBlock<Consumer, ConsumerDetails?>(async c =>
+      {
+        var details = await GetConsumerDetailsAsync(c.ContractId, c.Id, cancellationToken);
+        return details;
+      }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 5 });
+
+      await foreach (var c in FindConsumersAsync(filters, cancellationToken).ConfigureAwait(false))
+      {
+        transformBlock.Post(c);
+      }
+      transformBlock.Complete();
+
+      while (await transformBlock.OutputAvailableAsync(cancellationToken))
+      {
+        while (transformBlock.TryReceive(out var result))
+        {
+          if (result != null)
+            yield return result;
+        }
+      }
+    }
+
+    public async Task<ConsumerDetails?> GetConsumerDetailsAsync(string contractId, string consumerId, CancellationToken cancellationToken = default)
     {
       try
       {
-        var request = new RestRequest("CustomerMediaWebService/consumers");
-        if (contractId.HasValue)
-        {
-          var cid = contractId.Value.ToString();
-          request.AddQueryParameter("minContractId", cid);
-          request.AddQueryParameter("maxContractId", cid);
-        }
-        request.AddHeader("Accept", "application/json");
-        request.Method = Method.Get;
+        var detailRequest = new RestRequest(@$"CustomerMediaWebService/consumers/{contractId},{consumerId}/detail");
+        detailRequest.AddHeader("Accept", "application/json");
+        detailRequest.Method = Method.Get;
 
-        var getBlock = new ActionBlock<Consumer>(async c =>
+        var response = await _client.ExecuteGetAsync<ConsumerDetailResponse>(detailRequest, cancellationToken);
+        //_logger.LogDebug(response.Content);
+        var details = response.Data.ConsumerDetail;
+        if (details?.Identification != null)
         {
-          var details = await GetConsumerDetailsAsync(c.ContractId, c.Id, cancellationToken);
-          if (details != null)
+          if (details.Identification.PtcptType == 2)
           {
-            subject.OnNext(details);
+            return details;
           }
-        }, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 8 });
-
-        IEnumerable<Consumer> consumers = null;
-        var response = await _client.ExecuteGetAsync(request, cancellationToken);
-        _logger.LogDebug(response.Content);
-        try
-        {
-          var result = JsonConvert.DeserializeObject<ConsumerListResponse>(response.Content);
-          consumers = result.Consumers.Consumers;
         }
-        catch (JsonSerializationException)
-        {
-          var result = JsonConvert.DeserializeObject<SingleConsumerResponse>(response.Content);
-          consumers = result.Consumers.Consumers;
-        }
-        foreach (var c in consumers)
-        {
-          getBlock.Post(c);
-        }
-        getBlock.Complete();
-        await getBlock.Completion;
-        subject.OnCompleted();
       }
       catch (Exception ex)
       {
         _logger.LogError(ex.ToString());
-        subject.OnError(ex);
+      }
+
+      return null;
+    }
+
+
+    public async Task<int> CreateConsumerAsync(ConsumerDetails consumer, CancellationToken cancellationToken = default)
+    {
+      try
+      {
+        var contractId = consumer.Consumer.ContractId;
+        var detailRequest = new RestRequest(@$"CustomerMediaWebService/contracts/{contractId}/consumers");
+        detailRequest.AddXmlBody(consumer, xmlNamespace: "http://gsph.sub.com/cust/types");
+        detailRequest.AddHeader("Accept", "application/json");
+        detailRequest.Method = Method.Post;
+
+        var response = await _client.ExecutePostAsync<ConsumerDetailResponse>(detailRequest, cancellationToken);
+        _logger.LogDebug(response.Content);
+        var consumerId = response.Data.ConsumerDetail.Consumer.Id;
+        return Convert.ToInt32(consumerId);
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex.ToString());
+        throw;
       }
     }
+
+    public async Task<bool> UpdateConsumerAsync(ConsumerDetails consumer, CancellationToken cancellationToken = default)
+    {
+      try
+      {
+        var contractId = consumer.Consumer.ContractId;
+        var consumerId = consumer.Consumer.Id;
+        var detailRequest = new RestRequest(@$"CustomerMediaWebService/consumers/{contractId},{consumerId}/detail");
+        detailRequest.AddXmlBody(consumer, xmlNamespace: "http://gsph.sub.com/cust/types");
+        detailRequest.AddHeader("Accept", "application/json");
+        detailRequest.Method = Method.Put;
+
+        var response = await _client.ExecutePutAsync<ConsumerDetailResponse>(detailRequest, cancellationToken);
+        //_logger.LogDebug(response.Content);
+        return response.StatusCode == System.Net.HttpStatusCode.OK;
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex.ToString());
+        return false;
+      }
+    }
+
     #endregion
 
     #region Cashier
@@ -398,54 +430,5 @@ namespace Entrvo.Services
 
     }
 
-    public async Task<ConsumerDetails?> GetConsumerDetailsAsync(string contractId, string consumerId, CancellationToken cancellationToken = default)
-    {
-      try
-      {
-        var detailRequest = new RestRequest(@$"CustomerMediaWebService/consumers/{contractId},{consumerId}/detail");
-        detailRequest.AddHeader("Accept", "application/json");
-        detailRequest.Method = Method.Get;
-
-        var response = await _client.ExecuteGetAsync<ConsumerDetailResponse>(detailRequest, cancellationToken);
-        //_logger.LogDebug(response.Content);
-        var details = response.Data.ConsumerDetail;
-        if (details?.Identification != null)
-        {
-          if (details.Identification.PtcptType == 2)
-          {
-            return details;
-          }
-        }
-      }
-      catch (Exception ex)
-      {
-        _logger.LogError(ex.ToString());
-      }
-
-      return null;
-    }
-
-
-    public async Task<bool> UpdateConsumerAsync(ConsumerDetails consumer, CancellationToken cancellationToken = default)
-    {
-      try
-      {
-        var contractId = consumer.Consumer.ContractId;
-        var consumerId = consumer.Consumer.Id;
-        var detailRequest = new RestRequest(@$"CustomerMediaWebService/consumers/{contractId},{consumerId}/detail");
-        detailRequest.AddXmlBody(consumer, xmlNamespace: "http://gsph.sub.com/cust/types");
-        detailRequest.AddHeader("Accept", "application/json");
-        detailRequest.Method = Method.Put;
-
-        var response = await _client.ExecutePutAsync<ConsumerDetailResponse>(detailRequest, cancellationToken);
-        //_logger.LogDebug(response.Content);
-        return response.StatusCode == System.Net.HttpStatusCode.OK;
-      }
-      catch (Exception ex)
-      {
-        _logger.LogError(ex.ToString());
-        return false;
-      }
-    }
   }
 }

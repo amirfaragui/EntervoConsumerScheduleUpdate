@@ -5,9 +5,9 @@ using MimeKit;
 using MimeKit.Utils;
 using System.Drawing;
 using System.Drawing.Imaging;
-using T2WebApplication.Services.Models;
+using Entrvo.Services.Models;
 
-namespace T2WebApplication.Services
+namespace Entrvo.Services
 {
   public class EmailService : IEmailSender, IEmailService
   {

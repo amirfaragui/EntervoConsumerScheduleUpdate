@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Reflection;
 using Entrvo.DAL;
 
-namespace T2WebApplication.Models
+namespace Entrvo.Models
 {
   public class ImportColumnModel
   {

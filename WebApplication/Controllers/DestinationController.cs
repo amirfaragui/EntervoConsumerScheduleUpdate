@@ -1,10 +1,10 @@
 ﻿using Entrvo.Api;
 using Entrvo.Services;
 using Microsoft.AspNetCore.Mvc;
-using T2WebApplication.Models;
-using T2WebApplication.Services;
+using Entrvo.Models;
+using Entrvo.Services;
 
-namespace T2WebApplication.Controllers
+namespace Entrvo.Controllers
 {
   public class DestinationController : Controller
   {

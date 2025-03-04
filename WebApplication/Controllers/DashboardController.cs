@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using T2WebApplication.Services;
+using Entrvo.Services;
 
-namespace T2WebApplication.Controllers
+namespace Entrvo.Controllers
 {
   public class DashboardController : Controller
   {

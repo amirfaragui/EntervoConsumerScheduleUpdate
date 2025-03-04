@@ -1,7 +1,7 @@
 ﻿using System.Threading.Channels;
-using T2WebApplication.Models;
+using Entrvo.Models;
 
-namespace T2WebApplication.Services.Models
+namespace Entrvo.Services.Models
 {
   public enum JobStatus
   {

@@ -1,4 +1,4 @@
-﻿namespace T2WebApplication.Services.Models
+﻿namespace Entrvo.Services.Models
 {
   public class Export04ReportJobDescriptor : ScheduleJobDescriptor, IJobDescriptor
   {

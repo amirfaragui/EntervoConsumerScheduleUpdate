@@ -3,11 +3,11 @@ using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
 using Entrvo.DAL;
-using T2WebApplication.Models;
-using T2WebApplication.Services;
-using T2WebApplication.Services.Models;
+using Entrvo.Models;
+using Entrvo.Services;
+using Entrvo.Services.Models;
 
-namespace T2WebApplication.Controllers
+namespace Entrvo.Controllers
 {
   public class UploadController : Controller
   {

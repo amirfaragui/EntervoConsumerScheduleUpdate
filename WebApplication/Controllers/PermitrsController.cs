@@ -3,9 +3,9 @@ using Kendo.Mvc.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Entrvo.DAL;
-using T2WebApplication.Services;
+using Entrvo.Services;
 
-namespace T2WebApplication.Controllers
+namespace Entrvo.Controllers
 {
   public class PermitsController : EntityController<Permit>
   {

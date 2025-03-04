@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
 using Entrvo.Identity;
 
-namespace T2WebApplication.Areas.Identity.Pages.Account
+namespace Entrvo.Areas.Identity.Pages.Account
 {
   [AllowAnonymous]
     public class RegisterConfirmationModel : PageModel

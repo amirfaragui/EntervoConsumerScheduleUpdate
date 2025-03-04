@@ -3,7 +3,7 @@ using Serilog.Configuration;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace T2WebApplication.Services
+namespace Entrvo.Services
 {
 
   public static class LogbookServiceExtensions

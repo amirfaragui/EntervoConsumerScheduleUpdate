@@ -1,4 +1,4 @@
-﻿namespace T2WebApplication.Services.Models
+﻿namespace Entrvo.Services.Models
 {
   public abstract class ScheduleJobDescriptor: IJobDescriptor
   {

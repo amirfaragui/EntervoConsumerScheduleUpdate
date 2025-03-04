@@ -2,9 +2,9 @@
 using MQTTnet.Client;
 using MQTTnet.Packets;
 using System.Threading.Channels;
-using T2WebApplication.Models;
+using Entrvo.Models;
 
-namespace T2WebApplication.Hubs
+namespace Entrvo.Hubs
 {
   public class ImportProgressHub : MqttBaseHub<ImportJobProgress>
   {

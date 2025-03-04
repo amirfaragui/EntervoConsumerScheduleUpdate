@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Entrvo.DAL;
 using Kendo.Mvc.Extensions;
 
-namespace T2WebApplication.Controllers
+namespace Entrvo.Controllers
 {
   public class ConsumersController : Controller
   {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace T2WebApplication.Hubs
+namespace Entrvo.Hubs
 {
   public interface IConnectionEstablished
   {

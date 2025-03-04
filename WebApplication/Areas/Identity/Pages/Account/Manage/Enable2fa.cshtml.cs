@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Entrvo.Identity;
 
-namespace T2WebApplication.Areas.Identity.Pages.Account.Manage
+namespace Entrvo.Areas.Identity.Pages.Account.Manage
 {
   public class Enable2faModel : PageModel
     {

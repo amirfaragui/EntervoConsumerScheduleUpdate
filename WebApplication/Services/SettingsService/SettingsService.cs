@@ -2,9 +2,9 @@
 using Entrvo.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using T2WebApplication.Models;
+using Entrvo.Models;
 
-namespace T2WebApplication.Services
+namespace Entrvo.Services
 {
   public class SettingsService : BackgroundService, ISettingsService, IApiSettingsProvider
   {
@@ -19,14 +19,15 @@ namespace T2WebApplication.Services
     const string AverageFullFileSizeKey = "AverageFullFileSize";
     const string AverageIncrementalFileSizeKey = "AverageIncrementalFileSize";
 
-    const string SB_EndpointKey = "SB.Endpoint";
-    const string SB_UserNameKey = "SB.UserName";
-    const string SB_PasswordKey = "SB.Password";
-    const string SB_ContractNumberKey = "SB.ContractNumber";
-    const string SB_InstanceNumberKey = "SB.InstanceNumber";
-    const string SB_DatabaseInitializedKey = "SB.DatabaseInitialized";
+    const string SB_EndpointKey = "Entrvo.Endpoint";
+    const string SB_UserNameKey = "Entrvo.UserName";
+    const string SB_PasswordKey = "Entrvo.Password";
+    const string SB_ContractNumberKey = "Entrvo.ContractNumber";
+    const string SB_InstanceNumberKey = "Entrvo.InstanceNumber";
+    const string SB_DatabaseInitializedKey = "Entrvo.DatabaseInitialized";
 
-
+    const string FolderToMonitorKey = "FolderToMonitor";
+    const string FolderToBackupKey = "FolderToBackup";
 
     public SettingsService(IServiceScopeFactory scopedServiceFactory,
                            IMemoryCache memoryCache,
@@ -67,6 +68,9 @@ namespace T2WebApplication.Services
       model.Destination.InstanceNumber = settings.GetValue<int>(SB_InstanceNumberKey);
 
       model.IsConsumerDatabaseInitialized = settings.GetValue<bool>(SB_DatabaseInitializedKey);
+
+      model.DataFolder.MonitoringFolder = settings.GetValue<string>(FolderToMonitorKey);
+      model.DataFolder.BackupFolder = settings.GetValue<string>(FolderToBackupKey);
 
       var options = new MemoryCacheEntryOptions().SetPriority(CacheItemPriority.NeverRemove);
       _memoryCache.Set("t2-settings", model, options);
@@ -223,6 +227,44 @@ namespace T2WebApplication.Services
       _memoryCache.Set("t2-settings", cached, options);
     }
 
+    public async Task UpdateDataFolderSettingsAsync(DataFolderModel model, string userId)
+    {
+      using var scope = _scopedServiceFactory.CreateScope();
+      var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+      var settings = await context.Settings.ToArrayAsync();
+
+      var folderToMonitor = settings.FirstOrDefault(i => i.Key == FolderToMonitorKey);
+      if (folderToMonitor == null)
+      {
+        folderToMonitor = new Setting() { Key = FolderToMonitorKey };
+        context.Settings.Add(folderToMonitor);
+      }
+      folderToMonitor.Value = model.MonitoringFolder ?? string.Empty;
+
+      var folderToBackup = settings.FirstOrDefault(i => i.Key == FolderToBackupKey);
+      if (folderToBackup == null)
+      {
+        folderToBackup = new Setting() { Key = FolderToBackupKey };
+        context.Settings.Add(folderToBackup);
+      }
+      folderToBackup.Value = model.BackupFolder ?? string.Empty;
+
+
+      await context.SaveChangesAsync(userId);
+
+      var cached = await LoadSettingsAsync();
+      if (cached != null)
+      {
+        cached.DataFolder.MonitoringFolder = model.MonitoringFolder ?? string.Empty;
+        cached.DataFolder.BackupFolder = model.BackupFolder ?? string.Empty;
+      }
+
+      var options = new MemoryCacheEntryOptions().SetPriority(CacheItemPriority.NeverRemove);
+      _memoryCache.Set("t2-settings", cached, options);
+    }
+
+
     public async Task SetConsumerDatabaseInitialized(bool initialized)
     {
       using var scope = _scopedServiceFactory.CreateScope();
@@ -263,6 +305,8 @@ namespace T2WebApplication.Services
         Server = settings.Destination.Server,
         Username = settings.Destination.UserName,
         Password = settings.Destination.Password,
+        ContractNumber = settings.Destination.ContractNumber,
+        InstanceNumber = settings.Destination.InstanceNumber
       };
     }
   }

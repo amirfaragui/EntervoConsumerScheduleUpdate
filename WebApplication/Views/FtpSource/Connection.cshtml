@@ -29,8 +29,8 @@ Html.Kendo().Form<FtpSourceEditModel>()
       {
         i.Add().Field(m => m.Server);
         i.Add().Field(m => m.UserName);
-        i.Add().Field(m => m.Password).EditorTemplateHandler("setPasswordEditor");
-        i.Add().Field(m => m.ConfirmPassword).EditorTemplateHandler("setConfirmPasswordEditor");
+        i.Add().Field(m => m.Password); //.EditorTemplateHandler("setPasswordEditor");
+        i.Add().Field(m => m.ConfirmPassword); //.EditorTemplateHandler("setConfirmPasswordEditor");
       });
   })
 )
@@ -127,17 +127,17 @@ Html.Kendo().Form<FtpSourceEditModel>()
       var status = '@ViewBag.Status';
     }
 
-    function setPasswordEditor(container, options) {
-      $('<input type="password" id="Password" name="' + options.field + '" title="Password" required="required" autocomplete="off" aria-labelledby="Password-form-label" data-bind="value: Password" aria-describedby="Password-form-hint"/>')
-        .appendTo(container)
-        .kendoTextBox();
-    }
+    // function setPasswordEditor(container, options) {
+    //   $('<input type="password" id="Password" name="' + options.field + '" title="Password" required="required" autocomplete="off" aria-labelledby="Password-form-label" data-bind="value: Password" aria-describedby="Password-form-hint"/>')
+    //     .appendTo(container)
+    //     .kendoTextBox();
+    // }
 
-    function setConfirmPasswordEditor(container, options) {
-      $('<input type="password" id="ConfirmPassword" name="' + options.field + '" title="Confirm Password" required="required" autocomplete="off" aria-labelledby="ConfirmPassword-form-label" data-bind="value: ConfirmPassword" aria-describedby="ConfirmPassword-form-hint"/>')
-        .appendTo(container)
-        .kendoTextBox();
-    }
+    // function setConfirmPasswordEditor(container, options) {
+    //   $('<input type="password" id="ConfirmPassword" name="' + options.field + '" title="Confirm Password" required="required" autocomplete="off" aria-labelledby="ConfirmPassword-form-label" data-bind="value: ConfirmPassword" aria-describedby="ConfirmPassword-form-hint"/>')
+    //     .appendTo(container)
+    //     .kendoTextBox();
+    // }
 
     $(document).ready(function () {
       var status = '@ViewBag.Status';

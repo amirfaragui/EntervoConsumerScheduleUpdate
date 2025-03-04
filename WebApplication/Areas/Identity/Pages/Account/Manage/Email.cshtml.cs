@@ -12,7 +12,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
 
-namespace T2WebApplication.Areas.Identity.Pages.Account.Manage
+namespace Entrvo.Areas.Identity.Pages.Account.Manage
 {
   public class EmailModel : PageModel
   {

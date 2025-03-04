@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace T2WebApplication.Models
+namespace Entrvo.Models
 {
   public enum ImportJobStatus
   {

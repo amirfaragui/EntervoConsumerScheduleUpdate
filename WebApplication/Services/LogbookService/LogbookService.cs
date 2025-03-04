@@ -3,7 +3,7 @@ using Serilog.Events;
 using System.Collections.Concurrent;
 using System.Threading.Channels;
 
-namespace T2WebApplication.Services
+namespace Entrvo.Services
 {
   public class LogbookService : ILogEventSink, ILogbookService
   {
@@ -23,7 +23,7 @@ namespace T2WebApplication.Services
       {
         var context = logEvent.Properties["SourceContext"];
         var value = context.ToString().Trim('"');
-        if (value.StartsWith("T2WebApplication"))
+        if (value.StartsWith("Entrvo"))
         {
           var message = logEvent.RenderMessage(_formatProvider);
           foreach (var channel in _channels.Values)

@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using T2WebApplication.Hubs;
-using T2WebApplication.Models;
-using T2WebApplication.Services;
+using Entrvo.Hubs;
+using Entrvo.Models;
+using Entrvo.Services;
 
-namespace T2WebApplication.Controllers
+namespace Entrvo.Controllers
 {
   public class ProgressController: Controller
   {

@@ -12,7 +12,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using Entrvo.Identity;
 
-namespace T2WebApplication.Areas.Identity.Pages.Account
+namespace Entrvo.Areas.Identity.Pages.Account
 {
   public class ForgotPasswordModel : PageModel
     {

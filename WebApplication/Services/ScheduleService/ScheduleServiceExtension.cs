@@ -1,5 +1,5 @@
-﻿using T2WebApplication.Services;
-using T2WebApplication.Services.Models;
+﻿using Entrvo.Services;
+using Entrvo.Services.Models;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

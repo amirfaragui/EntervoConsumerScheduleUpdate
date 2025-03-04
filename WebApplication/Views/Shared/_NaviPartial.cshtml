@@ -52,10 +52,10 @@
     {
       <panelbar-item text="Settings" expanded=@NavPages.IsSettingsExpanded(ViewContext)>
         <items>
-          <panelbar-item text="Source" href="/FtpSource" selected=@NavPages.IsFtpSourceSelected(ViewContext)></panelbar-item>
-          <panelbar-item text="Destination" href="/Destination" selected=@NavPages.IsApiEndpointSelected(ViewContext)></panelbar-item>
-@*           <panelbar-item text="Users" href="/Users" selected=@NavPages.IsUsersSelected(ViewContext)></panelbar-item>
- *@        </items>
+          <panelbar-item text="Data Folders" href="/dataFolders" selected=@NavPages.IsDataFoldersSelected(ViewContext)></panelbar-item>
+          <panelbar-item text="Entrvo API" href="/Destination" selected=@NavPages.IsApiEndpointSelected(ViewContext)></panelbar-item>
+          @* <panelbar-item text="Users" href="/Users" selected=@NavPages.IsUsersSelected(ViewContext)></panelbar-item>  *@ 
+        </items>
       </panelbar-item>
     }
     else if (isManager && !isAdmin)

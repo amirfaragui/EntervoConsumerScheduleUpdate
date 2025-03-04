@@ -13,10 +13,10 @@ using System.Globalization;
 using Entrvo.DAL;
 using Entrvo.Identity;
 using Entrvo.Identity.EntityFramework;
-using T2WebApplication;
-using T2WebApplication.Hubs;
-using T2WebApplication.Identity;
-using T2WebApplication.Services;
+using Entrvo;
+using Entrvo.Hubs;
+using Entrvo.Identity;
+using Entrvo.Services;
 using Entrvo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -140,6 +140,11 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddChannelSink(logbookService);
 builder.Services.AddSignalR();
 builder.Services.AddEmailService(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddFileWatcherService(options =>
+{
+  options.BaseDirectory = "App_Data";
+  options.FileTypes = ["*.csv", "*.txt"];
+});
 builder.Services.AddWindowsService();
 
 builder.Services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();

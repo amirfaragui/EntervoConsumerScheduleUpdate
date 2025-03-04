@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace T2WebApplication.Models
+namespace Entrvo.Models
 {
   public class ColumnMappingModel
   {

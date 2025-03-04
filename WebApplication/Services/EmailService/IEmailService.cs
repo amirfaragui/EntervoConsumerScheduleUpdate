@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace T2WebApplication.Services
+namespace Entrvo.Services
 {
   public interface IEmailService
   {

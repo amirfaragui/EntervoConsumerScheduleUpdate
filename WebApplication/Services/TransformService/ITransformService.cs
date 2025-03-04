@@ -1,6 +1,6 @@
-﻿using T2WebApplication.Services.Models;
+﻿using Entrvo.Services.Models;
 
-namespace T2WebApplication.Services
+namespace Entrvo.Services
 {
   public interface ITransformService: IDisposable
   {

@@ -1,5 +1,5 @@
 ﻿using MQTTnet.AspNetCore;
-using T2WebApplication.Services;
+using Entrvo.Services;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

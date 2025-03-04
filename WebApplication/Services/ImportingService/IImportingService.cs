@@ -1,7 +1,7 @@
 ﻿using Entrvo.DAL;
-using T2WebApplication.Models;
+using Entrvo.Models;
 
-namespace T2WebApplication.Services
+namespace Entrvo.Services
 {
   public interface IImportingService
   {

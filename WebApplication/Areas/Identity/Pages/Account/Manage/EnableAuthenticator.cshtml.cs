@@ -11,7 +11,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using Entrvo.Identity;
 
-namespace T2WebApplication.Areas.Identity.Pages.Account.Manage
+namespace Entrvo.Areas.Identity.Pages.Account.Manage
 {
   public class EnableAuthenticatorModel : PageModel
     {

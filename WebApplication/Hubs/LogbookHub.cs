@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System.Threading.Channels;
-using T2WebApplication.Services;
+using Entrvo.Services;
 
-namespace T2WebApplication.Hubs
+namespace Entrvo.Hubs
 {
   public class LogbookHub : Hub
   {
