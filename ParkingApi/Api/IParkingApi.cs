@@ -1,7 +1,6 @@
 ﻿using Entrvo.Api;
 using Entrvo.Api.Models;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,6 +36,7 @@ namespace Entrvo.Services
     Task<Shift> CreateShiftAsync(Cashier cashier, Device device, CancellationToken cancellationToken = default);
     Task<Device[]> GetDevicesAsync(CancellationToken cancellationToken = default);
     Task<Transaction> PostPayment(TransactionDetail transaction, CancellationToken cancellationToken = default);
+    Task<UsageProfile[]> GetUsageProfilesAsync(CancellationToken cancellationToken = default);
 
 
 
@@ -48,7 +48,7 @@ namespace Entrvo.Services
 
     IAsyncEnumerable<ConsumerDetails> FindConsumerDetailssAsync(IDictionary<ConsumerFilter, object> filters, CancellationToken cancellationToken = default);
 
-    Task<int> CreateConsumerAsync(ConsumerDetails consumer, CancellationToken cancellationToken = default);
+    Task<int> CreateConsumerAsync(int templateId, ConsumerDetails consumer, CancellationToken cancellationToken = default);
 
     Task<bool> UpdateConsumerAsync(ConsumerDetails consumer, CancellationToken cancellationToken = default);
   }

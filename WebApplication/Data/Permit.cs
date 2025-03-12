@@ -5,7 +5,7 @@ using Entrvo.DAL.Attributes;
 
 namespace Entrvo.DAL
 {
-  public class Permit : IDataEntity
+  public class Permit : IDataEntity<int>
   {
     [StringLength(48), Display(Name = "Group")] public string? AccessGroup { get; set; }
     [StringLength(48)] public string? ActiveCredentialID { get; set; }

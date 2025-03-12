@@ -6,6 +6,13 @@
 <h3>History</h3>
 
 
+<script>
+  function getCardNo() {
+    return { cardNumber: '@ViewBag.CardNumber' };
+  }
+</script>
+
+
 <script id="eventTemplate" type="text/x-kendo-template">
   <div class="k-card-inner">
       <div class="k-card-header">
@@ -60,7 +67,7 @@
 @(Html.Kendo().DataSource<History>()
     .Name("sharedDataSource")
     .Custom(dataSource => dataSource
-       .Transport(tr => tr.Read(read => read.Action("_read", "history")))
+       .Transport(tr => tr.Read(read => read.Action("_read", "history").Data("getCardNo")))
        .Sort(sort => sort.Add(m => m.EventTime).Descending())
     )
 )

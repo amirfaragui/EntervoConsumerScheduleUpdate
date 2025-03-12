@@ -5,7 +5,7 @@ using Entrvo.DAL.Attributes;
 
 namespace Entrvo.DAL
 {
-  public class Customer : IDataEntity
+  public class Customer : IDataEntity<int>
   {
     [Column(TypeName = "decimal(7,2)"), Display(Name = "Account Balance")]
     public decimal AccountBalance { get; set; }

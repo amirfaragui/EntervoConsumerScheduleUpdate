@@ -37,6 +37,7 @@ Html.Kendo().Form<ApiDestinationEditModel>()
       {
         i.Add().Field(m => m.ContractNumber).Editor(e => e.NumericTextBox().Format("{0:#}").Decimals(0));
         i.Add().Field(m => m.InstanceNumber).Editor(e => e.NumericTextBox().Format("{0:#}").Decimals(0));
+        i.Add().Field(m => m.TemplateNumber).Editor(e => e.NumericTextBox().Format("{0:#}").Decimals(0));
       });
   })
 )

@@ -17,6 +17,10 @@ namespace Entrvo.Models
     [Display(Name = "Instance No.")]
     public int InstanceNumber { get; set; }
 
+    [Range(0, 999)]
+    [Display(Name = "Template No.")]
+    public int TemplateNumber { get; set; }
+
     public ApiDestinationModel()
     {
       Server = @"https://209.151.135.7:8443";

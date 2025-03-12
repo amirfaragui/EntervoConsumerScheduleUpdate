@@ -15,7 +15,7 @@ namespace Entrvo.Api.Models
 
 
     [XmlElement("id")]
-    public string Id { get; set; }
+    public string? Id { get; set; }
 
 
     [JsonProperty("contractid")]
@@ -23,44 +23,31 @@ namespace Entrvo.Api.Models
     public string ContractId { get; set; }
 
     [XmlElement("name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
 
     [JsonProperty("xValidFrom")]
     [XmlElement("xValidFrom")]
-    public string ValidFrom { get; set; }
+    public string? ValidFrom { get; set; }
 
 
     [JsonProperty("xValidUntil")]
     [XmlElement("xValidUntil")]
-    public string ValidUntil { get; set; }
+    public string? ValidUntil { get; set; }
     
     
     [XmlElement("filialId")]
-    public string FilialId { get; set; }
+    public string? FilialId { get; set; }
   }
 
   public class Person
   {
     [XmlElement("firstName")]
-    public string FirstName { get; set; }
+    public string? FirstName { get; set; }
     [XmlElement("surname")]
-    public string Surname { get; set; }
+    public string? Surname { get; set; }
     [XmlElement("matchCode")]
-    public string MatchCode { get; set; }
-  }
-
-  public class UsageProfile
-  {
-    [JsonProperty("@href")]
-    [XmlElement("href")]
-    public string Href { get; set; }
-    [XmlElement("id")]
-    public int Id { get; set; }
-    [XmlElement("name")]
-    public string Name { get; set; }
-    [XmlElement("description")]
-    public string Description { get; set; }
+    public string? MatchCode { get; set; }
   }
 
   public class Identification
@@ -74,9 +61,9 @@ namespace Entrvo.Api.Models
     [XmlElement("identificationType")]
     public int IdentificationType { get; set; }
     [XmlElement("validFrom")]
-    public string ValidFrom { get; set; }
+    public string? ValidFrom { get; set; }
     [XmlElement("validUntil")]
-    public string ValidUntil { get; set; }
+    public string? ValidUntil { get; set; }
 
     [XmlElement("usageProfile")]
     public UsageProfile UsageProfile { get; set; }
@@ -130,16 +117,16 @@ namespace Entrvo.Api.Models
     [XmlElement("person")]
     public Person Person { get; set; }
     [XmlElement("firstName")]
-    public string FirstName { get; set; }
+    public string? FirstName { get; set; }
     [XmlElement("surname")]
-    public string Surname { get; set; }
+    public string? Surname { get; set; }
     [XmlElement("identification")] 
     public Identification Identification { get; set; }
     [JsonProperty("ConsumerAtributes")]
     [XmlElement("consumerAtributes")]
     public ConsumerAttributes ConsumerAttributes { get; set; }
     [XmlElement("displayText")]
-    public string DisplayText { get; set; }
+    public string? DisplayText { get; set; }
     [XmlElement("limit")]
     public int Limit { get; set; }
     [XmlElement("status")]
@@ -149,21 +136,24 @@ namespace Entrvo.Api.Models
     [XmlElement("ignorePresence")]
     public int IgnorePresence { get; set; }
     [XmlElement("lpn1")]
-    public string Lpn1 { get; set; }
+    public string? Lpn1 { get; set; }
     [XmlElement("lpn2")]
-    public string Lpn2 { get; set; }
+    public string? Lpn2 { get; set; }
     [XmlElement("lpn3")]
-    public string Lpn3 { get; set; }
+    public string? Lpn3 { get; set; }
 
     [JsonProperty("userfield1")]
     [XmlElement("userfield1")]
-    public string UserField1 { get; set; }
+    public string? UserField1 { get; set; }
     [JsonProperty("userfield2")]
     [XmlElement("userfield2")]
-    public string UserField2 { get; set; }
+    public string? UserField2 { get; set; }
     [JsonProperty("userfield3")]
     [XmlElement("userfield3")]
-    public string UserField3 { get; set; }
+    public string? UserField3 { get; set; }
+
+    [XmlElement("memo")]
+    public string? Memo { get; set; }
 
     public override string ToString()
     {

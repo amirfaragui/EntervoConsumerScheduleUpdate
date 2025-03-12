@@ -5,7 +5,7 @@ using Entrvo.DAL.Attributes;
 
 namespace Entrvo.DAL
 {
-  public class Note: IDataEntity
+  public class Note: IDataEntity<int>
   {
     [StringLength(20)]
     public string? Document { get; set; }

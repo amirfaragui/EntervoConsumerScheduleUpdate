@@ -1,3 +1,9 @@
+using Entrvo;
+using Entrvo.DAL;
+using Entrvo.Hubs;
+using Entrvo.Identity;
+using Entrvo.Identity.EntityFramework;
+using Entrvo.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,14 +16,6 @@ using Newtonsoft.Json.Serialization;
 using Serilog;
 using Serilog.Settings.Configuration;
 using System.Globalization;
-using Entrvo.DAL;
-using Entrvo.Identity;
-using Entrvo.Identity.EntityFramework;
-using Entrvo;
-using Entrvo.Hubs;
-using Entrvo.Identity;
-using Entrvo.Services;
-using Entrvo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -145,6 +143,8 @@ builder.Services.AddFileWatcherService(options =>
   options.BaseDirectory = "App_Data";
   options.FileTypes = ["*.csv", "*.txt"];
 });
+builder.Services.AddEntrvoService();
+
 builder.Services.AddWindowsService();
 
 builder.Services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();

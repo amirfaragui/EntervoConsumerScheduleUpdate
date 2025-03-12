@@ -3,14 +3,17 @@ using System.Globalization;
 using System.Reflection;
 using Entrvo.Models;
 
-namespace Entrvo.DAL
-{ 
+namespace Entrvo
+{
+  public interface IDataEntity<T>: IDataEntity
+  {
+    public T GetId();
+  }
   public interface IDataEntity
   {
-    public int GetId();
   }
 
-  static class CustomerMappingExtensions
+  static class MappingExtensions
   {
     public static bool TrySetValue<T>(this T customer, PropertyInfo property, ImportColumnModel column, out object value) where T : class, IDataEntity
     {

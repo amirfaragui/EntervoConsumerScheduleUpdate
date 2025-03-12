@@ -34,6 +34,8 @@ namespace Entrvo.DAL
     [StringLength(256)]
     public string? FileUrl { get; set; }
 
+    public Guid? ConsumerId { get; set; }
+
     public Event()
     {
       Time = DateTime.Now;

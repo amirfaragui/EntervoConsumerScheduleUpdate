@@ -1,0 +1,178 @@
+﻿using Entrvo.DAL;
+using Entrvo.Models;
+using Entrvo.Services.Models;
+using EntrvoWebApp.Services;
+using EntrvoWebApp.Services.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
+using System.Reflection;
+
+namespace Entrvo.Services
+{
+  public class EntrvoService : BackgroundService, IEntrvoService
+  {
+    private readonly ISettingsService _settingsService;
+    private readonly ILogger<EntrvoService> _logger;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly IFileWatcherService _fileWatcherService;
+    private readonly IMqttService _mqttService;
+
+    private readonly ConcurrentQueue<string> _fileQueue = new ConcurrentQueue<string>();
+
+    public EntrvoService(ISettingsService settingsService,
+                         IMqttService mqttService,
+                         IServiceScopeFactory serviceScopeFactory,
+                         IFileWatcherService fileWatcherService,
+                         ILogger<EntrvoService> logger)
+    {
+      _settingsService = settingsService;
+      _logger = logger;
+      _serviceScopeFactory = serviceScopeFactory;
+      _fileWatcherService = fileWatcherService;
+      _mqttService = mqttService;
+
+      _fileWatcherService.OnFileReady += OnFileReady;
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+      while (!stoppingToken.IsCancellationRequested)
+      {
+        if (_fileQueue.TryDequeue(out var file))
+        {
+          _logger.LogInformation($"Processing file {file}");
+          await ProcessFile(file, stoppingToken);
+        }
+        await Task.Delay(1000, stoppingToken);
+      }
+    }
+
+    public Task Enqueue(string file)
+    {
+      _fileQueue.Enqueue(file);
+      return Task.CompletedTask;
+    }
+
+    private void OnFileReady(object? sender, FileChangeEventArgs e)
+    {
+      _fileQueue.Enqueue(e.FullPath);
+    }
+
+    private async Task ProcessFile(string file, CancellationToken cancellationToken)
+    {
+      using var scope = _serviceScopeFactory.CreateScope();
+      var parser = scope.ServiceProvider.GetRequiredService<IFileParser>();
+      var importer = scope.ServiceProvider.GetRequiredService<IEntrvoConsumerService>();
+      var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+      var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+      var properties = typeof(EntrvoRecord).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
+      var mappings = properties.Select(i => new ColumnMappingModel()
+      {
+        Target = i.Name,
+        Header = i.Name,
+        Value = i.PropertyType.ToString(),
+      }).ToArray();
+      for (var i = 0; i < mappings.Length; i++)
+      {
+        mappings[i].Index = i + 1;
+      }
+
+      var model = new ImportSourceModel
+      {
+        FileName = file,
+        KeySelector = s => s[1],
+        TargetType = typeof(EntrvoRecord),
+        Mappings = mappings
+      };
+
+      await foreach (var data in parser.ParseFileAsync<EntrvoRecord>(model, cts.Token))
+      {
+        _logger.LogInformation($"Parsed {data}");
+        try
+        {
+          var consumer = await importer.UpdateConsumerAsync(data, cts.Token);
+          if (consumer != null)
+          {
+            try
+            {
+              var dbItem = await context.Consumers.FirstOrDefaultAsync(i => i.CardNumber == data.GetId());
+              if (dbItem == null)
+              {
+                dbItem = new Consumer();
+                context.Consumers.Add(dbItem);
+              }
+
+              dbItem.CardNumber = data.GetId();
+              dbItem.LPN1 = data.LPN1;
+              dbItem.LPN2 = data.LPN2;
+              dbItem.LPN3 = consumer.Lpn3;
+              dbItem.FirstName = data.FirstName;
+              dbItem.LastName = data.LastName;
+              dbItem.ConsumerId = consumer.Consumer.Id;
+              dbItem.ContractId = consumer.Consumer.ContractId;
+              dbItem.Memo1 = consumer.Memo;
+              dbItem.Memo2 = consumer.UserField1;
+              dbItem.Memo3 = consumer.UserField2;
+              if (DateTime.TryParse(consumer.Consumer.ValidUntil, out var validUntil))
+              {
+                dbItem.ValidUntil = validUntil;
+              }
+
+              var fileName = Path.GetFileName(file);
+              var evt = new Event()
+              {
+                Time = DateTime.Now,                
+                Message = $"Consumer {dbItem.CardNumber} updated from file '{file}'.",
+                Details = data.ToString(),
+                Type =  JobType.ConsumerUpdate,
+                ConsumerId = dbItem.Id,
+                FileUrl = file,
+              };
+              context.Events.Add(evt);
+
+              await context.SaveChangesAsync(cts.Token).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+              _logger.LogError(ex.ToString());
+            }
+            finally
+            {
+              context.ChangeTracker.Clear();
+            }
+          }
+        }
+        catch (Exception ex)
+        {
+          _logger.LogError(ex.ToString());
+        }
+      }
+
+      #region Backup file
+      var settings = await _settingsService.LoadSettingsAsync();
+      var backupFolder = settings.DataFolder.BackupFolder;
+      if (!string.IsNullOrEmpty(backupFolder) && Directory.Exists(backupFolder))
+      {
+        var fileName = Path.GetFileNameWithoutExtension(file);
+        var ext = Path.GetExtension(file);
+        var backupFile = Path.Combine(backupFolder, $"{fileName}-{DateTime.Now:yyMMddHHmm}{ext}");
+        if (File.Exists(backupFile))
+        {
+          File.Delete(backupFile);
+        }
+
+        try
+        {
+          File.Move(file, backupFile);
+        }
+        catch (Exception ex)
+        {
+          _logger.LogError(ex.ToString());
+        }
+      }
+      #endregion
+    }
+  }
+}

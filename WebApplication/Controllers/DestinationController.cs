@@ -25,6 +25,9 @@ namespace Entrvo.Controllers
       {
         Server = settings.Destination.Server,
         UserName = settings.Destination.UserName,
+        ContractNumber = settings.Destination.ContractNumber,
+        InstanceNumber = settings.Destination.InstanceNumber,
+        TemplateNumber = settings.Destination.TemplateNumber
       };
       return View(model);
     }
@@ -42,13 +45,6 @@ namespace Entrvo.Controllers
         client.Initialize(options);
 
         var devices = await client.GetDevicesAsync();
-
-        //var settings = await _settingsService.LoadSettingsAsync();
-        //settings.Destination.Server = model.Server;
-        //settings.Destination.UserName = model.UserName;
-        //settings.Destination.Password = model.Password;
-        //settings.Destination.ContractNumber = model.ContractNumber;
-        //settings.Destination.InstanceNumber = model.InstanceNumber;
 
         await _settingsService.UpdateApiSettingsAsync(model, string.Empty);
 

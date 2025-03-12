@@ -183,7 +183,7 @@ namespace Entrvo.Services
                   newCustomer = true;
                 }
 
-                var entity = (IDataEntity)customer;
+                var entity = (IDataEntity<int>)customer;
                 foreach (var column in columns)
                 {
                   var key = column.Column.ToString();
@@ -321,7 +321,7 @@ namespace Entrvo.Services
                   newPermit = true;
                 }
 
-                var entity = (IDataEntity)permit;
+                var entity = (IDataEntity<int>)permit;
                 foreach (var column in columns)
                 {
                   var key = column.Column.ToString();
@@ -460,7 +460,7 @@ namespace Entrvo.Services
                   newEmail = true;
                 }
 
-                var entity = (IDataEntity)email;
+                var entity = (IDataEntity<int>)email;
                 foreach (var column in columns)
                 {
                   var key = column.Column.ToString();
@@ -602,7 +602,7 @@ namespace Entrvo.Services
                 columns.Remove(sourceColumn);
 
 
-                IDataEntity entity = null;
+                IDataEntity<int> entity = null;
                 IDictionary<string, PropertyInfo> properties = null;
 
 
@@ -616,7 +616,7 @@ namespace Entrvo.Services
                       dbContext.CustomerNotes.Add(customerNote);
                       newNote = true;
                     }
-                    entity = (IDataEntity)customerNote;
+                    entity = (IDataEntity<int>)customerNote;
                     properties = customerNoteProperties;
                     break;
 
@@ -628,7 +628,7 @@ namespace Entrvo.Services
                       dbContext.PermitNotes.Add(permitNote);
                       newNote = true;
                     }
-                    entity = (IDataEntity)permitNote;
+                    entity = (IDataEntity<int>)permitNote;
                     properties = permitNoteProperties;
                     break;
 
@@ -640,7 +640,7 @@ namespace Entrvo.Services
                       dbContext.Notes.Add(note);
                       newNote = true;
                     }
-                    entity = (IDataEntity)note;
+                    entity = (IDataEntity<int>)note;
                     properties = genericNoteProperties;
                     break;
                 }

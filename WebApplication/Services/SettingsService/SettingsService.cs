@@ -24,6 +24,8 @@ namespace Entrvo.Services
     const string SB_PasswordKey = "Entrvo.Password";
     const string SB_ContractNumberKey = "Entrvo.ContractNumber";
     const string SB_InstanceNumberKey = "Entrvo.InstanceNumber";
+    const string SB_TemplateNumberKey = "Entrvo.TemplateNumber";
+
     const string SB_DatabaseInitializedKey = "Entrvo.DatabaseInitialized";
 
     const string FolderToMonitorKey = "FolderToMonitor";
@@ -66,6 +68,7 @@ namespace Entrvo.Services
       model.Destination.Password = settings.GetValue<string>(SB_PasswordKey);
       model.Destination.ContractNumber = settings.GetValue<int>(SB_ContractNumberKey);
       model.Destination.InstanceNumber = settings.GetValue<int>(SB_InstanceNumberKey);
+      model.Destination.TemplateNumber = settings.GetValue<int>(SB_TemplateNumberKey);
 
       model.IsConsumerDatabaseInitialized = settings.GetValue<bool>(SB_DatabaseInitializedKey);
 
@@ -211,6 +214,14 @@ namespace Entrvo.Services
       }
       instanceNumber.Value = model.InstanceNumber.ToString();
 
+      var templateNumber = settings.FirstOrDefault(i => i.Key == SB_TemplateNumberKey);
+      if (templateNumber == null)
+      {
+        templateNumber = new Setting() { Key = SB_TemplateNumberKey };
+        context.Settings.Add(templateNumber);
+      }
+      templateNumber.Value = model.TemplateNumber.ToString();
+
       await context.SaveChangesAsync(userId);
 
       var cached = await LoadSettingsAsync();
@@ -221,6 +232,7 @@ namespace Entrvo.Services
         cached.Destination.Password = model.Password ?? string.Empty;
         cached.Destination.ContractNumber = model.ContractNumber;
         cached.Destination.InstanceNumber = model.InstanceNumber;
+        cached.Destination.TemplateNumber = model.TemplateNumber;
       }
 
       var options = new MemoryCacheEntryOptions().SetPriority(CacheItemPriority.NeverRemove);

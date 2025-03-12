@@ -15,19 +15,29 @@ namespace Entrvo.Controllers
       _environment = environment;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(string? cardNumber)
     {
+      ViewBag.CardNumber = cardNumber;
       return View();
     }
 
     [HttpGet]
-    public async Task<IActionResult> _Read()
+    public async Task<IActionResult> _Read(string? cardNumber)
     {
       var cutoffDay = DateTime.Today.AddDays(1);
-      var history = await _context.Events.Where(i => EF.Functions.DateDiffDay(i.Time, cutoffDay) <= 90)
-        .OrderByDescending(i => i.Time).ToArrayAsync();
+      var history = _context.Events.Where(i => EF.Functions.DateDiffDay(i.Time, cutoffDay) <= 90);
 
-      var result = history.Select(i => new History()
+      if (!string.IsNullOrEmpty(cardNumber))
+      {
+        var consumer = await _context.Consumers.FirstOrDefaultAsync(i => i.CardNumber == cardNumber);
+        if (consumer != null)
+        {
+          history = history.Where(i => i.ConsumerId == consumer.Id);
+        }
+      }
+
+      var data = await history.ToListAsync();
+      var result = data.Select(i => new History()
       {
         Id = i.Id,
         EventTime = i.Time,
@@ -36,10 +46,10 @@ namespace Entrvo.Controllers
         Url = GetRelativePath(i.FileUrl),
       }).ToArray();
 
-      foreach (var item in result.Where(i => !string.IsNullOrEmpty(i.Url)))
-      {
-        item.Actions = new[] { new HistoryAction { text = "Download", url = Url.Action("download", "history", new { id = item.Id }) } };
-      }
+      //foreach (var item in result.Where(i => !string.IsNullOrEmpty(i.Url)))
+      //{
+      //  item.Actions = new[] { new HistoryAction { text = "Download", url = Url.Action("download", "history", new { id = item.Id }) } };
+      //}
 
       return Json(result);
 

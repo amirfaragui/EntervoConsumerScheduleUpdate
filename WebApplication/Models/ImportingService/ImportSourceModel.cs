@@ -8,21 +8,11 @@
     public bool FirstLineHeader { get; set; }
     public string Delimiter { get; set; }
 
-    //public int? DefaultSiteCode { get; set; }
-
-    //public Guid? DefaultGroupId { get; set; }
-
-    //public Guid? DefaultCompanyId { get; set; }
-
-    //public Guid? DefaultTermId { get; set; }
-
-    //public IdentifierType DefaultIdentifierType { get; set; }
-
-    //public CardFunction CardFunction { get; set; }
-
     public ICollection<ColumnMappingModel> Mappings { get; set; }
 
     public Type? TargetType { get; set; }
+
+    public Func<string[], object>? KeySelector { get; set; }  
 
     public ImportSourceModel()
     {

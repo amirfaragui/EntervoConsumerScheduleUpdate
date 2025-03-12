@@ -1,0 +1,1818 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+
+<!-- ********************************************************************* -->
+<!-- *                                                                   * -->
+<!-- * File:    customer_media.xsd                                       * -->
+<!-- * Author:  Bernd Moeller                                            * -->
+<!-- *                                                                   * -->
+<!-- * Schema definition for XML Data in REST requests and responses     * -->
+<!-- * of the CustMediaWs                                                * -->
+<!-- *                                                                   * -->
+<!-- ********************************************************************* -->
+
+<schema xmlns:gsph-cust="http://gsph.sub.com/cust/types" targetNamespace="http://gsph.sub.com/cust/types" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+    <annotation>
+      <documentation>
+      History
+      --------
+      
+      18.10.2011     Moe
+      consumer was not properly linked to usage profile. Usage profile was not properly structured
+      
+      25.10.2011     Moe
+      added list type and element for sales transactions
+      added list type and element for park transactions
+      added list type and element for contract details
+      added list type and element for consumer details
+      
+      07.11.2011     Moe
+      added xValidFrom, xValidUntil to consumerType
+      
+      30.11.2011     Moe
+      added parkTransactionsType, parkTransactionType, transactionType
+      
+      06.12.2011     Moe
+      added present in identificationType
+      changed counterType (minVal = 1 maxVal=9999)
+      fixed wrong name contractDetailss -&gt; contractDetails
+      
+      02.01.2012     Moe
+      added annotations for consumerDetailType
+	  
+      12.07.2012     Moe
+      modified some restriction
+
+      27.07.2012     Moe
+      modified data type for contract id to unsigned long
+
+      30.07.2012     Moe
+      added reference to contract / consumer in invoiceItemType
+
+      30.10.2012     Moe
+      paymentTypeType      fixed payment types
+      transactionType      completed transaction types
+
+      15.11.2012     Kub
+      FE7028: 
+            identificationType.ptcptGrpNo
+
+      11.03.2013     Moe
+      FE7202: 
+            identificationType.admission
+            invoiceItemType.pointofsale
+      
+      1.10.2013     Kub
+      FE7472: identificationType.chrgOvdrftAcct (Overage fee)
+      
+      2.10.2013    Moe, Kub
+      FE7375: SEPA handling
+
+      5.11.2013     Kub
+      FE7243: Exportable transaction mark
+
+      27.01.2014     Kub
+      FE7641: invoiceDetailType.termofpaymentdatetime
+	      bankacctType.sepacreditoridentifier
+	      add vatType.Z
+      
+      5.3.2014 Kub
+      FE7681:  identificationType.ptcptType
+	       templatesType of templateType
+	       createContract/Consumer with new QueryParam templateId
+	       GET templates/contracts
+	       GET templates/consumers
+	       parkTransactionType.contractid
+	       parkTransactionType.consumerid
+	       profiles?onlineAvailable
+	       
+       13.8.2014 Kub
+       FE7973: contractDetailType.invoicegroup
+       
+       11.11.2014 Kub
+       FE8162: FreeFacilities
+       
+       25.5.2015
+       FE8410:       
+            contractDetailType.deliverPerson
+            contractDetailType.contractAttributes
+            contractDetailType.loyalty
+            consumerDetailType.consumerAtributes
+            consumerDetailType.loyalty
+       
+       28.8.2015 Kub
+       consumerAtributes.flatRateAmt
+       
+       23.2.2016 Kub
+       consumerDetailType.ignorePresence
+       
+       2.3.2016 Kub
+       FE9064:
+            create a new element bookParkTransactionType
+            set some items in invoiceItemType and parkTransactionType to requiered
+            
+       14.07.2016 Kub
+       FE N/Y add:
+            consumerAtributes.invoiceType      
+            consumerAtributes.minInvoice
+            consumerAtributes.maxInvoice
+            consumerAtributes.creditEntry
+       FE9288 add:     
+            invoicePDF
+            
+       13.9.2016 Kub
+       FE N/Y add:
+            extend a paymentTypeType for ney paymants type for portal
+       FE9429 add:
+            add new resources for get week profiles
+            add sepaOwnerAddress and sepaOwnerPerson into paymentInfoType
+       FE10091 add:
+            customer number: 		contractType:cstmrId40
+            contract number: 		contractDetailType:cntrctId40
+            SAP customer number:        contractType:cstmrIdSAP
+            SAP contract number:        contractDetailType:cntrctIdSAP
+            consumer number: 		consumerType:cnsmrId40
+            produkt Nr: 		cintractDetailType:productId40
+            
+       14.5.2018 Hri
+       FE 9901/10200 add:
+            complexType -> poolingType
+            complexType -> poolingDetailType
+            
+       28.8.2018 Hri
+       FE 10563 add:
+            poolingDetailType.poolingProfile
+            usageProfileSettingsType.datafield1
+            usageProfileSettingsType.datafield2
+            usageProfileSettingsType.datafield3
+       
+       20.12.2018 Hri
+       Bug 11953 / FE 10733 add:
+            poolingDetailType.overruns
+            
+       25.2.2019 Hri
+       FE 10748 add:
+            element     -> pooling
+       
+       26.11.2019 Hri
+       FE 11037 add:
+            complexType -> identifiersType
+            complexType -> identifierType
+            element     -> identifiers
+            consumerDetailType.identifiers
+            parkTransactionType.lpn
+            
+       22.01.2020 Hri
+       FE 11109 edit:
+            bookParkTransactionType -> both transaction no more mandatory
+                            
+      </documentation>
+    </annotation>
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Version Type                                                      * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="version" type="gsph-cust:versionType">
+	<annotation>
+	    <documentation>
+		 This element is used as the key version information of the REST interface.
+	    </documentation>
+	</annotation>
+    </element>
+    <complexType name="versionType">
+      <sequence>
+          <element name="version" type="string" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+    </complexType>
+
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Resources Type                                                    * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="resources" type="gsph-cust:resourcesType">
+	<annotation>
+	    <documentation>
+		This element provides a dictionary of all available application resources and their URIs.
+	    </documentation>
+	</annotation>
+    </element>
+    <complexType name="resourcesType">
+      <sequence>
+          <element name="resource" type="string" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+    </complexType>
+
+   <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * List of Contracts (collection of contract)                        * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="contracts" type="gsph-cust:contractsType"/>
+    
+    <complexType name="contractsType">
+      <annotation>
+        <documentation>Defines a list of contract keys</documentation>
+      </annotation>
+      <sequence>
+          <element name="contract" type="gsph-cust:contractType" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+    </complexType>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Contract Type                                                     * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="contract" type="gsph-cust:contractType">
+        <annotation>
+            <documentation>This element is used as the key contract information. This element is sent
+                when querying lists in order to avoid sending whole datasets
+            </documentation>
+        </annotation>
+    </element>
+    <complexType name="contractType">
+      <sequence>
+          <element name="id" type="gsph-cust:contractIdType" minOccurs="1" maxOccurs="1">
+            <annotation>
+              <documentation>Unique identifier of a contract.
+                The range is between 2 and 49999 for contracts based for a single cell
+                and between 50000 and 99999 for contracts based on management level.
+              </documentation>
+            </annotation>
+          </element>
+          <element name="cstmrId40" type="gsph-cust:string20" minOccurs="0" maxOccurs="1"/>
+          <element name="cstmrIdSAP" type="gsph-cust:string50" minOccurs="0" maxOccurs="1"/>
+          <element name="name" type="gsph-cust:string33" minOccurs="0" maxOccurs="1"/>
+          <element name="xValidFrom" type="date" minOccurs="0" maxOccurs="1"/>
+          <element name="xValidUntil" type="date" minOccurs="0" maxOccurs="1"/>
+          <element name="filialId" type="unsignedShort" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+      <attribute name="href" type="anyURI">
+        <annotation>
+          <documentation>The URI supplied in this field can be used to query the
+            detailed information of a contract
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+        
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Contract Detail Type                                              * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="contractDetail" type="gsph-cust:contractDetailType">
+        <annotation>
+            <documentation>
+                The contract detail element is the container for further complex elements:
+
+                Contract:             Key contract information
+                Person:               Peronal attributes like first name, last name etc.
+                Address:              Standard Address
+                Invoice Address:      Address where the invoice should be sent
+                paymentInfo:          Information about payment details
+                counting:             company counting information
+                present:              number of present consumersassociated to a contract
+            </documentation>
+        </annotation>
+    </element>
+    <complexType name="contractDetailType">
+        <sequence>
+            <element name="contract" type="gsph-cust:contractType"/>
+            <element name="contractAttributes" type="gsph-cust:contractAttributesType" minOccurs="0" maxOccurs="1"/>
+            <element name="contractno" type="string" minOccurs="0" maxOccurs="1"/>
+            <element name="cntrctId40" type="gsph-cust:string20" minOccurs="0" maxOccurs="1"/>
+            <element name="cntrctIdSAP" type="gsph-cust:string50" minOccurs="0" maxOccurs="1"/>
+            <element name="productId40" type="gsph-cust:string20" minOccurs="0" maxOccurs="1"/>
+            <element name="person" type="gsph-cust:personAttributesType" minOccurs="0" maxOccurs="1"/>
+            <element name="stdAddr" type="gsph-cust:addressType" minOccurs="0" maxOccurs="1"/>
+            <element name="deliveryPerson" type="gsph-cust:personAttributesType" minOccurs="0" maxOccurs="1"/>
+            <element name="deliveryAddr" type="gsph-cust:addressType" minOccurs="0" maxOccurs="1"/>
+            <element name="paymentInfo" type="gsph-cust:paymentInfoType" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="counting" type="gsph-cust:counterType" minOccurs="0" maxOccurs="1"/>
+            <element name="present" type="unsignedShort" minOccurs="0" maxOccurs="1"/>
+            <element name="status" type="unsignedShort" minOccurs="0" maxOccurs="1"/>
+            <element name="delete" type="unsignedShort" minOccurs="0" maxOccurs="1"/>
+            <element name="memo" type="gsph-cust:string51" minOccurs="0" maxOccurs="1"/>
+            <element name="userfield1" type="gsph-cust:string128" minOccurs="0" maxOccurs="1"/>
+            <element name="userfield2" type="gsph-cust:string128" minOccurs="0" maxOccurs="1"/>
+            <element name="userfield3" type="gsph-cust:string128" minOccurs="0" maxOccurs="1"/>
+            <element name="invoicegroup" type="unsignedShort" minOccurs="0" maxOccurs="1"/>
+            <element name="loyalty" type="gsph-cust:loyaltyType" minOccurs="0" maxOccurs="1"/>
+            <element name="pooling" type="gsph-cust:poolingType" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+    </complexType>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Contract attributte Type                                                     * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="contractAttributes" type="gsph-cust:contractAttributesType"/>        
+        
+    <complexType name="contractAttributesType">
+      <sequence>  
+        <element name="autoBlockDays" minOccurs="0" maxOccurs="1" type="unsignedShort"/>
+        <element name="prePayment" minOccurs="0" maxOccurs="1" type="unsignedLong"/>
+        <element name="discountCash" minOccurs="0" maxOccurs="1" type="unsignedShort"/>
+        <element name="discount" minOccurs="0" maxOccurs="1" type="gsph-cust:discountType"/>
+        <element name="discountValue" minOccurs="0" maxOccurs="1" type="unsignedLong"/>
+        <element name="feeType" minOccurs="0" maxOccurs="1" type="gsph-cust:feeTypeType"/>
+        <element name="flatFee" minOccurs="0" maxOccurs="1" type="unsignedLong"/>
+        <element name="vat" minOccurs="0" maxOccurs="1" type="gsph-cust:vatType"/>
+        <element name="flatFeeCalcUntil" minOccurs="0" maxOccurs="1" type="date"/>
+        <element name="flatFeeType" minOccurs="0" maxOccurs="1" type="gsph-cust:flatFeeTypeType"/>
+        <element name="flatFeeCalc" minOccurs="0" maxOccurs="1" type="gsph-cust:flatFeeCalcType"/>
+        <element name="flatFeeFirstMonth" minOccurs="0" maxOccurs="1" type="gsph-cust:flatFeeFirstMonthType"/>
+        <element name="flatFeeLastMonth" minOccurs="0" maxOccurs="1" type="gsph-cust:flatFeeLastMonthType"/>
+      </sequence>
+    </complexType>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * List of Contractdetails (collection of contract details)          * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="contractDetails" type="gsph-cust:contractDetailsType"/>
+
+    <complexType name="contractDetailsType">
+      <annotation>
+        <documentation>Defines a list of contract details</documentation>
+      </annotation>
+      <sequence>
+          <element name="contractDetail" type="gsph-cust:contractDetailType" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+    </complexType>
+
+    <!-- ************************************************************************** -->
+    <!-- *                                                                        * -->
+    <!-- * List of Contractfreefacilities (collection of contract free facilities * -->
+    <!-- *                                                                        * -->
+    <!-- ************************************************************************** -->
+    <element name="contractFreeFacilities" type="gsph-cust:contractFreeFacilitiesType"/>
+
+    <complexType name="contractFreeFacilitiesType">
+      <annotation>
+        <documentation>Defines a list of contract free facilities</documentation>
+      </annotation>
+      <sequence>
+          <element name="contractFreeFacility" type="gsph-cust:contractFreeFacilityType" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+    </complexType>
+
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Contract free facilitie Type                                     * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="contractFreeFacility" type="gsph-cust:contractFreeFacilityType">
+        <annotation>
+            <documentation>
+            The contract freefacility element is the container for further complex elements:
+
+            </documentation>
+        </annotation>
+    </element>
+    <complexType name="contractFreeFacilityType">
+        <sequence>
+            <element name="xValidFrom" type="date"/>
+            <element name="xValidUntil" type="date"/>
+            <element name="facilityid" type="unsignedShort"/>
+        </sequence>
+    </complexType>
+
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Consumer Type                                                     * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="consumer" type="gsph-cust:consumerType">
+        <annotation>
+            <documentation>The consumer type comprises the key information of a person
+                who accesses a car park. The key information comprises the consumer id, the
+                id of the contract the consumer is related to and the main personal attributes
+                like name.
+            </documentation>
+        </annotation>
+    </element>
+    <complexType name="consumerType">
+        <sequence>
+            <element name="id" type="gsph-cust:consumerIdType" minOccurs="1" maxOccurs="1">
+              <annotation>
+                <documentation>
+                    This is the unique identifier within the contract the consumer is belonging to.
+                    When creating a consumer the system will provide this number automatically (next free number).
+                    The range is between 1 and 99.998.
+                </documentation>
+              </annotation>
+            </element>
+            <element name="contractid" type="gsph-cust:contractIdType" minOccurs="1" maxOccurs="1">
+              <annotation>
+                <documentation>
+                    This is the reference to the id of the contract to which the consumer belongs to.
+                    Contract id together with the consumer id are unique in the system.
+                </documentation>
+              </annotation>
+            </element>
+            <element name="cnsmrId40" type="gsph-cust:string20" minOccurs="0" maxOccurs="1"/>
+            <element name="name" type="string" minOccurs="0" maxOccurs="1"/>
+            <element name="xValidFrom" type="date" minOccurs="0" maxOccurs="1"/>
+            <element name="xValidUntil" type="date" minOccurs="0" maxOccurs="1"/>
+            <element name="filialId" type="unsignedShort" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+        <attribute name="href" type="anyURI"/>
+    </complexType>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * consumer detail                                                   * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="consumerDetail" type="gsph-cust:consumerDetailType"/>
+    <complexType name="consumerDetailType">
+        <sequence>
+            <element name="consumer" type="gsph-cust:consumerType" minOccurs="0" maxOccurs="1"/>
+            <element name="person" type="gsph-cust:personAttributesType" minOccurs="0" maxOccurs="1"/>
+            <element name="firstName" type="gsph-cust:string33" minOccurs="0" maxOccurs="1"/>
+            <element name="surname" type="gsph-cust:string31" minOccurs="0" maxOccurs="1"/>
+            <element name="identification" type="gsph-cust:identificationType" minOccurs="1" maxOccurs="unbounded"/>
+            <element name="consumerAtributes" type="gsph-cust:consumerAtributesType" minOccurs="0" maxOccurs="1"/>  
+            <element name="billingData" type="gsph-cust:billingDataType" minOccurs="0" maxOccurs="1"/>              
+            <element name="displayText" type="string" minOccurs="0" maxOccurs="1"/>
+            <element name="currencyRef" type="string" minOccurs="0" maxOccurs="1">
+              <annotation>
+                <documentation>Currently not supported</documentation>
+              </annotation>
+            </element>
+            <element name="limit" type="unsignedLong" minOccurs="0" maxOccurs="1"/>
+            <element name="limitPerDay" type="unsignedLong" minOccurs="0" maxOccurs="1"/>
+            <element name="transactionPerDay" type="unsignedLong" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Currently not supported</documentation>
+              </annotation>
+            </element>
+            <element name="memo" type="gsph-cust:string51" minOccurs="0" maxOccurs="1">
+              <annotation>
+                <documentation>Any additional information can be entered here.
+                    The memo has no operational effect.
+                    The information is displayed in the customer administration user interface
+                </documentation>
+              </annotation>
+            </element>
+            <element name="status" type="unsignedLong" minOccurs="0" maxOccurs="1"/>
+            <element name="delete" type="unsignedLong" minOccurs="0" maxOccurs="1"/>
+            <element name="ignorePresence" type="unsignedShort" minOccurs="0" maxOccurs="1"/>
+            <element name="lpn1" type="gsph-cust:string15" minOccurs="0" maxOccurs="1"/>
+            <element name="lpn2" type="gsph-cust:string15" minOccurs="0" maxOccurs="1"/>
+            <element name="lpn3" type="gsph-cust:string15" minOccurs="0" maxOccurs="1"/>
+            <element name="userfield1" type="gsph-cust:string128" minOccurs="0" maxOccurs="1"/>
+            <element name="userfield2" type="gsph-cust:string128" minOccurs="0" maxOccurs="1"/>
+            <element name="userfield3" type="gsph-cust:string128" minOccurs="0" maxOccurs="1"/>
+            <element name="loyalty" type="gsph-cust:loyaltyType" minOccurs="0" maxOccurs="1"/>
+            <element name="identifiers" minOccurs="0" maxOccurs="1" type="gsph-cust:identifiersType"/>
+        </sequence>
+    </complexType>
+
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * List of Consumers (Collection of Consumer)                        * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="consumers" type="gsph-cust:consumersType"/>
+    <complexType name="consumersType">
+        <sequence>
+            <element name="consumer" type="gsph-cust:consumerType" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * List of Consumer Details                                          * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="consumerDetails" type="gsph-cust:consumerDetailsType"/>
+    <complexType name="consumerDetailsType">
+        <sequence>
+            <element name="consumerDetail" type="gsph-cust:consumerDetailType" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+    
+   <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Contract attributte Type                                           * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="consumerAtributes" type="gsph-cust:consumerAtributesType"/>        
+        
+    <complexType name="consumerAtributesType">
+      <sequence>  
+          <element name="productionDate" minOccurs="0" maxOccurs="1" type="date">
+            <annotation>
+                <documentation>read only</documentation>
+            </annotation>
+          </element>
+          <element name="productionCount" minOccurs="0" maxOccurs="1" type="unsignedShort">
+            <annotation>
+                <documentation>read only</documentation>
+            </annotation>
+          </element>
+          <element name="flatFeeFirstCharge" minOccurs="0" maxOccurs="1" type="gsph-cust:flatFeeFirstMonthType"/>
+          <element name="flatFeeLastCharge" minOccurs="0" maxOccurs="1" type="gsph-cust:flatFeeLastMonthType"/>
+          <element name="flatFeeCalc" minOccurs="0" maxOccurs="1" type="gsph-cust:flatFeeCalcType"/>
+          <element name="flatFeeCalcUntil" minOccurs="0" maxOccurs="1" type="date"/>
+          <element name="individualInvoicing" minOccurs="0" maxOccurs="1" type="unsignedShort"/>
+		  <element name="flatRateAmt" minOccurs="0" maxOccurs="1" type="unsignedLong"/>
+          <element name="flatFeeTax" minOccurs="0" maxOccurs="1" type="gsph-cust:vatType"/>
+          <element name="flatFeeType" minOccurs="0" maxOccurs="1" type="gsph-cust:flatFeeTypeType"/>
+          
+          <element name="invoiceType" minOccurs="0" maxOccurs="1" type="gsph-cust:invoiceTypeType"/>
+          <element name="minInvoice" minOccurs="0" maxOccurs="1" type="unsignedLong"/>
+          <element name="maxInvoice" minOccurs="0" maxOccurs="1" type="unsignedLong"/>
+          <element name="creditEntry" minOccurs="0" maxOccurs="1" type="unsignedLong"/>       
+      </sequence>
+    </complexType>   
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Identification                                                    * -->
+    <!-- *                                                                   * -->
+    <!-- * In terms of the "old" system this is a "Teilnehmer"               * -->
+    <!-- * In terms of the "new" system this could be a e.g Credit Card      * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <complexType name="identificationType">
+      <sequence>
+          <element name="id" type="unsignedLong" minOccurs="0" maxOccurs="1"/>
+          <element name="ptcptType" type="integer" minOccurs="0" maxOccurs="1"/>
+          <element name="cardno" type="gsph-cust:string9" minOccurs="0" maxOccurs="1"/>
+          <element name="cardclass" type="unsignedShort" minOccurs="0" maxOccurs="1"/>
+          <element name="identificationType" type="integer" minOccurs="0" maxOccurs="1"/>
+          <element name="validFrom" type="date" minOccurs="0" maxOccurs="1"/>
+          <element name="validUntil" type="date" minOccurs="0" maxOccurs="1"/>
+          <element name="usageProfile" type="gsph-cust:usageProfileType" minOccurs="0" maxOccurs="1"/>
+          <element name="admission" type="gsph-cust:admissionType" minOccurs="0" maxOccurs="1"/>
+          <element name="ignorePresence" type="unsignedShort" minOccurs="0" maxOccurs="1"/>
+          <element name="present" type="boolean" minOccurs="0" maxOccurs="1"/>
+          <element name="status" type="unsignedShort" minOccurs="0" maxOccurs="1"/>
+          <element name="ptcptGrpNo" type="unsignedShort" minOccurs="0" maxOccurs="1"/>
+	  <element name="chrgOvdrftAcct" type="unsignedShort" minOccurs="0" maxOccurs="1"/>
+      </sequence>
+    </complexType>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Consumers`s identifiers                                           * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="identifiers" type="gsph-cust:identifiersType"/>
+    
+    <complexType name="identifiersType">
+      <sequence>  
+        <element name="identifier" type="gsph-cust:identifierType" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+    </complexType>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Identifier data                                                   * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <complexType name="identifierType">
+        <annotation>
+            <documentation>ReadOnly params - card number and license plate </documentation>
+        </annotation>
+        <sequence>
+            <element name="ptcptId" type="unsignedLong" minOccurs="0" maxOccurs="1"/>
+            <element name="cardNo" type="gsph-cust:string9" minOccurs="0" maxOccurs="1"/>
+            <element name="licensePlate" type="gsph-cust:string15" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+    </complexType>
+
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Billing data                                                      * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="billingData" type="gsph-cust:billingDataType"/>
+    <complexType name="billingDataType">
+        <annotation>
+            <documentation>ReadOnly param of person, adress and payment data for consumer (Shadow invoice) </documentation>
+        </annotation>
+        <sequence>
+            <element name="billingPerson" type="gsph-cust:personAttributesType" minOccurs="1" maxOccurs="1"/>
+            <element name="billingAddr" type="gsph-cust:addressType" minOccurs="1" maxOccurs="1"/>
+            <element name="paymentInfo" type="gsph-cust:paymentInfoType" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+    </complexType>
+
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Invoice Type                                                      * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="invoice" type="gsph-cust:invoiceType"/>
+    <complexType name="invoiceType">
+        <sequence>
+            <element name="id" type="unsignedLong"/>
+            <element name="invcDate" type="dateTime"/>
+            <element name="invcAmount" type="unsignedLong"/>
+            <element name="companyRef" type="integer"/>
+            <element name="companyUrl" type="anyURI"/>
+        </sequence>
+        <attribute name="href" type="anyURI">
+            <annotation>
+                <documentation>Contains a URI which references a resource with detailed invoice information</documentation>
+            </annotation>
+        </attribute>
+    </complexType>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Invoices Type (Collection of Invoices)                            * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="invoices" type="gsph-cust:invoicesType"/>
+    <complexType name="invoicesType">
+        <sequence>
+            <element name="invoice" type="gsph-cust:invoiceType" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * invoice detail                                                    * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="invoiceDetail" type="gsph-cust:invoiceDetailType"/>
+    <complexType name="invoiceDetailType">
+        <sequence>
+            <element name="invoice" type="gsph-cust:invoiceType"/>
+            <element name="fakturadate" type="dateTime"/>
+            <element name="paystatus" type="unsignedShort"/>
+            <element name="amontToPay" type="unsignedShort"/>
+            <element name="clearingflag" type="unsignedShort"/>
+            <element name="paydatetime" type="dateTime"/>
+            <element name="remindercnt" type="unsignedShort"/>
+            <element name="lastrmddate" type="dateTime"/>
+            <element name="invoiceItem" type="gsph-cust:invoiceItemType" minOccurs="1" maxOccurs="unbounded"/>
+	    <element name="termofpaymentdatetime" type="dateTime"/>
+        </sequence>
+    </complexType>
+    
+    <complexType name="invoiceItemType">
+        <sequence>
+	    <element name="contractid" type="unsignedLong" minOccurs="1" maxOccurs="1"/>
+	    <element name="consumerid" type="unsignedLong" minOccurs="1" maxOccurs="1"/>
+	    <element name="articleid" type="unsignedLong" minOccurs="1" maxOccurs="1"/>
+	    <element name="articleclass" type="unsignedShort" minOccurs="1" maxOccurs="1"/>
+	    <element name="articlename" type="string"/>
+	    <element name="quantity" type="long"/>
+	    <element name="singleprice" type="float"/>
+	    <element name="totalamount" type="unsignedLong" minOccurs="1" maxOccurs="1"/>
+	    <element name="servicetime" type="dateTime"/>
+	    <element name="selltime" type="dateTime"/>
+	    <element name="vattype" type="gsph-cust:vatType"/>
+	    <element name="vatamount" type="unsignedLong"/>
+	    <element name="pointofsale" type="unsignedShort">
+            <annotation>
+                <documentation>This field contains the facility id of the transaction</documentation>
+            </annotation>
+	    </element>
+	    <element name="extexpmark" type="unsignedShort"/>    
+	    <element name="extexptime" type="dateTime"/> 
+        </sequence>
+    </complexType>
+    
+   <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * invoice detail                                                    * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="invoicePDF" type="gsph-cust:invoicePDFType"/>
+    <complexType name="invoicePDFType">
+        <sequence>
+            <element name="invoice" type="gsph-cust:invoiceType"/>
+            <element name="pdfStringData" type="string"/>
+	    <element name="termofpaymentdatetime" type="dateTime"/>
+        </sequence>
+    </complexType>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Template Type                                                     * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="template" type="gsph-cust:templateType"/>
+    <complexType name="templateType">
+      <sequence>
+          <element name="id" type="unsignedLong"/>
+          <element name="name" type="gsph-cust:string33"/>
+      </sequence>
+    </complexType>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Tempates Type (Collection of Templates)                           * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="templates" type="gsph-cust:templatesType"/>
+    <complexType name="templatesType">
+        <sequence>
+            <element name="template" type="gsph-cust:templateType" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+
+
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Invoice Job                                                       * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="invoiceJob" type="gsph-cust:invoiceJobType"/>
+    <complexType name="invoiceJobType">
+        <sequence>
+          
+          <element name="jobId" type="unsignedLong">
+            <annotation>
+              <documentation>Unique Identifier of the job</documentation>
+            </annotation>
+          </element>
+            <element name="jobType" type="gsph-cust:invoiceJobTypeType">
+              <annotation>
+                <documentation>Type of the invoice job. Can be one of the types defined in invoiceJobTypeType</documentation>
+              </annotation>
+            </element>
+            <element name="startTime" type="dateTime">
+              <annotation>
+                <documentation>Date and time when the service should execute this job</documentation>
+              </annotation>
+            </element>
+            <element name="refDate" type="dateTime">
+              <annotation>
+                <documentation>Reference date for factura job</documentation>
+              </annotation>
+            </element>
+            <element name="status" type="int">
+              <annotation>
+                <documentation>Current status of the job</documentation>
+              </annotation>
+            </element>
+            <element name="invoiceRef" type="anyURI" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Invoice Jobs (Collection of Invoice Jobs                          * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="invoiceJobs" type="gsph-cust:invoiceJobsType"/>
+     <complexType name="invoiceJobsType">
+        <annotation>
+            <documentation>
+                This is the collection of invoice jobs. It can contain a one or more invoice
+                job elements or can be empty
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="invoiceJob" type="gsph-cust:invoiceJobType" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+    
+
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Account Type                                                      * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="account" type="gsph-cust:accountType"/>
+    <complexType name="accountType">
+        <sequence>
+            <element name="accountTransaction" type="gsph-cust:accountTransactionType" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Account Transaction Type                                          * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <complexType name="accountTransactionType">
+        <sequence>
+            <element name="id" type="unsignedLong"/>
+            <element name="transactType" type="int">
+              <annotation>
+                <documentation>
+                    possible values for transactType to be described here
+                </documentation>
+              </annotation>
+            </element>
+            <element name="createTime" type="dateTime"/>
+            <element name="bookingTime" type="dateTime"/>
+            <element name="itemInfo" type="string"/>
+            <element name="termOfPayment" type="dateTime"/>
+            <element name="amount" type="unsignedLong"/>
+            <element name="desc" type="string"/>
+        </sequence>
+    </complexType>
+
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Sales Transaction Type                                            * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="salesTransaction" type="gsph-cust:invoiceItemType"/>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * List of Sales Transactions Type (collection of sales transactions)* -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="salesTransactions" type="gsph-cust:salesTransactionsType"/>
+
+    <complexType name="salesTransactionsType">
+      <annotation>
+        <documentation>Defines a list of sales transactions</documentation>
+      </annotation>
+      <sequence>
+          <element name="salesTransaction" type="gsph-cust:invoiceItemType" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+    </complexType>
+
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Park Transaction Type                                            * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="parkTransaction" type="gsph-cust:invoiceItemType"/>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * List of Parking Transactions Type (collection of parking transactions)* -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="parkTransactions" type="gsph-cust:parkTransactionsType"/>
+
+    <complexType name="parkTransactionsType">
+      <annotation>
+            <documentation>Defines a list of park transactions</documentation>
+      </annotation>
+      <sequence>
+            <element name="parkTransaction" type="gsph-cust:parkTransactionType" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+    </complexType>
+    
+    <element name="bookParkTransaction" type="gsph-cust:bookParkTransactionType"/>
+    
+    <complexType name="bookParkTransactionType">
+      <annotation>
+            <documentation>Defines a entry and exit of booking park transactions</documentation>
+      </annotation>
+      <sequence>
+          <element name="entryParkTransaction" type="gsph-cust:parkTransactionType" minOccurs="0" maxOccurs="1"/>
+          <element name="exitParkTransaction" type="gsph-cust:parkTransactionType" minOccurs="0" maxOccurs="1"/>
+          <element name="paymentParkTransaction" type="gsph-cust:parkTransactionType" minOccurs="0" maxOccurs="1">
+            <annotation>
+                  <documentation>define a payment response transaction</documentation>
+            </annotation>
+          </element>
+      </sequence>
+    </complexType>
+    
+    <complexType name="parkTransactionType">
+        <sequence>
+            <element name="transactionTime" type="dateTime" minOccurs="1" maxOccurs="1"/>
+            <element name="transactionType" type="gsph-cust:transactionType" minOccurs="1" maxOccurs="1"/>
+            <element name="facilityin" type="short"/>
+            <element name="facilityout" type="short"/>
+            <element name="computer" type="short" minOccurs="1" maxOccurs="1"/>
+            <element name="device" type="short" minOccurs="1" maxOccurs="1"/>
+            <element name="amount" type="unsignedLong" minOccurs="1" maxOccurs="1"/>
+	    
+            <element name="contractid" type="unsignedLong" minOccurs="1" maxOccurs="1"/>
+            <element name="consumerid" type="unsignedLong" minOccurs="1" maxOccurs="1"/>
+            <element name="lpn" type="gsph-cust:string15" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+    </complexType>
+    
+<!-- ********************************************************************* -->	    
+    
+    <element name="errorResponse" type="gsph-cust:errorResponseType"/>
+    <complexType name="errorResponseType">
+        <sequence>
+            <element name="error" type="gsph-cust:errorType" minOccurs="1" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+    
+    <complexType name="errorType">
+        <annotation>
+            <documentation>Defines the structure of an error message which might be
+            sent as a response body
+            </documentation>
+        </annotation>
+        <sequence>
+            <element name="errCode" type="nonNegativeInteger"/>
+            <element name="shortMsg" type="string"/>
+            <element name="message" type="string"/>
+            <element name="causeMessage" type="string"/>
+        </sequence>
+    </complexType>
+
+    <element name="batch" type="gsph-cust:batchType">
+      <annotation>
+        <documentation>Represents a batch job</documentation>
+      </annotation>
+    </element>
+    <complexType name="batchType">
+        <sequence>
+            <element name="id" type="unsignedShort"/>
+            <element name="type" type="unsignedShort">
+              <annotation>
+                <documentation>  1 = Batch creating contracts
+                                 2 = Batch creating consumers
+                </documentation>
+              </annotation>
+            </element>
+            <element name="status" type="unsignedShort">
+                <annotation>
+                    <documentation>  
+                        0 = Waiting
+                        1 = Running
+                        2 = Finish
+                        3 = Finish with error or warning
+                        4 = Error
+                    </documentation>
+              </annotation>
+            </element>
+            <element name="contracts" type="gsph-cust:contractsType"/>
+            <element name="consumers" type="gsph-cust:consumersType"/>
+            <element name="contractsErrors" type="gsph-cust:errorResponseType"/>
+            <element name="consumersErrors" type="gsph-cust:errorResponseType"/>
+        </sequence>
+    </complexType>
+
+
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Usage Profile Type                                                * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <complexType name="usageProfileType">
+        <sequence>
+            <element name="id" type="unsignedShort"  maxOccurs="1" minOccurs="1"/>
+            <element name="name" type="string" maxOccurs="1" minOccurs="0"/>
+            <element name="description" type="string" maxOccurs="1" minOccurs="0"/>
+        </sequence>
+        <attribute name="href" type="anyURI">
+          <annotation>
+            <documentation>This hyperlink links to the detailed representation of the usage profile
+            </documentation>
+          </annotation>
+        </attribute>
+    </complexType>
+
+    <element name="usageProfileDetail" type="gsph-cust:usageProfileDetailType"/> 
+    
+    <complexType name="usageProfileDetailType">
+      <sequence>
+        <element name="usageProfile" type="gsph-cust:usageProfileType" maxOccurs="1" minOccurs="1"/>
+        <element name="usageProfileSettings" type="gsph-cust:usageProfileSettingsType" minOccurs="1" maxOccurs="unbounded"/>
+      </sequence>
+    </complexType>
+    <complexType name="usageProfileSettingsType">
+        <sequence>
+            <element name="profileid" type="unsignedShort" maxOccurs="1" minOccurs="1"/>
+            <element name="versionid" type="unsignedLong" maxOccurs="1" minOccurs="1"/>
+            <element name="validFrom" type="dateTime" maxOccurs="1" minOccurs="1"/>
+            <element name="validUntil" type="dateTime" maxOccurs="1" minOccurs="1"/>
+            <element name="maxCount" type="unsignedShort" maxOccurs="1" minOccurs="1"/>
+            <element name="flatrateamount" type="unsignedLong" maxOccurs="1" minOccurs="1"/>
+            <element name="flatratevattype" type="gsph-cust:vatType" maxOccurs="1" minOccurs="1"/>
+            <element name="bestabr" type="unsignedShort" maxOccurs="1" minOccurs="1"/>
+            <element name="bestabrmin" type="unsignedLong" maxOccurs="1" minOccurs="1"/>
+            <element name="bestabrmax" type="unsignedLong" maxOccurs="1" minOccurs="1"/>
+            <element name="datafield1" type="gsph-cust:string128" maxOccurs="1" minOccurs="0"/>
+            <element name="datafield2" type="gsph-cust:string128" maxOccurs="1" minOccurs="0"/>
+            <element name="datafield3" type="gsph-cust:string128" maxOccurs="1" minOccurs="0"/>
+            <element name="usageProfileFacilities" type="gsph-cust:usageProfileFacilitiesType" minOccurs="1" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+    <complexType name="usageProfileFacilitiesType">
+         <sequence>
+            <element name="profileid" type="unsignedShort"/>
+            <element name="versionid" type="unsignedLong"/>
+            <element name="facilityid" type="unsignedShort"/>
+            <element name="timeprofile" type="unsignedShort"/>
+            <element name="admittance" type="unsignedShort"/>
+            <element name="inprofilerate" type="unsignedShort"/>
+            <element name="outprofilerate" type="unsignedShort"/>
+            <element name="countReserved" type="boolean"/>
+         </sequence>
+    </complexType>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * List of Usage Profiles Type (collection of usage profiles)        * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="usageProfiles" type="gsph-cust:usageProfilesType"/>
+
+    <complexType name="usageProfilesType">
+      <annotation>
+        <documentation>Defines a list of usaged profiles</documentation>
+      </annotation>
+      <sequence>
+          <element name="usageProfile" type="gsph-cust:usageProfileType" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+    </complexType>    
+
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * List of week day prog prof Type                                   * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="weekDayProgProfs" type="gsph-cust:weekDayProgProfsType"/>
+
+    <complexType name="weekDayProgProfsType">
+      <annotation>
+        <documentation>Defines a list of week day prog prof</documentation>
+      </annotation>
+      <sequence>
+          <element name="weekDayProgProf" type="gsph-cust:weekDayProgProf" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+    </complexType>   
+
+    <complexType name="weekDayProgProf">
+        <sequence>
+            <element name="id" type="unsignedShort"  maxOccurs="1" minOccurs="1"/>
+            <element name="name" type="string" maxOccurs="1" minOccurs="0"/>
+        </sequence>
+    </complexType>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Contract`s pooling data                                           * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <element name="pooling" type="gsph-cust:poolingType"/>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Person Type                                                       * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <complexType name="personAttributesType">
+      <annotation>
+        <documentation>
+        Definition of person related data. Person is used by consumer as well as contract
+        contact information.
+        Please be aware that in a consumer context the some fields are not available.
+        Fields marked with 'Not supported in context of a consumer' will discarded by the server in POSTs or PUTs
+        </documentation>
+      </annotation>
+      <sequence>
+            <element name="salutation" type="string" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation></element>
+            <element name="title" type="string" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation></element>
+            <element name="firstName" type="gsph-cust:string33" minOccurs="0" maxOccurs="1"/>
+            <element name="middleName" type="string" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation></element>
+            <element name="surname" type="gsph-cust:string31" minOccurs="0" maxOccurs="1"/>
+            <element name="gender" type="gsph-cust:genderType" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation></element>
+            <element name="birthday" type="date" minOccurs="0" maxOccurs="1">
+              <annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation>
+            </element>
+            <element name="lang" type="language" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation></element>
+            <element name="contractLang" type="language" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation></element>
+            <element name="matchCode" type="string" minOccurs="0" maxOccurs="1"/>
+            <element name="phone1" type="gsph-cust:string25" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation></element>
+            <element name="phone2" type="string" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation></element>
+            <element name="phone3" type="string" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation></element>
+            <element name="fax" type="gsph-cust:string25" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation></element>
+            <element name="email1" type="gsph-cust:string128" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation></element>
+            <element name="email2" type="string" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation></element>
+            <element name="homepage" type="string" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation></element>
+            <element name="department" type="string" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation></element>
+            <element name="departmentno" type="string" minOccurs="0" maxOccurs="1"><annotation>
+                <documentation>Not supported in context of a consumer personal data</documentation>
+              </annotation></element>
+        </sequence>
+    </complexType>
+    
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * Address Type                                                      * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <complexType name="addressType">
+        <sequence>
+            <element name="street" type="gsph-cust:string31" minOccurs="0" maxOccurs="1"/>
+            <element name="houseno" type="string" minOccurs="0" maxOccurs="1"/>
+            <element name="town" type="gsph-cust:string23" minOccurs="0" maxOccurs="1"/>
+            <element name="postbox" type="gsph-cust:string9" minOccurs="0" maxOccurs="1"/>
+<!--            <element name="postbox" minOccurs="0" maxOccurs="1">
+                <restriction base="string">
+                    <maxLength value="9"/>
+                    <minLength value="0"/>
+                </restriction>
+            </element>-->
+            <element name="country" type="string" minOccurs="0" maxOccurs="1"/>
+            <element name="state" type="gsph-cust:string32" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+    </complexType>
+
+    <!-- ********************************************************************* -->
+    <!-- *                                                                   * -->
+    <!-- * PaymentInfo Type                                                  * -->
+    <!-- *                                                                   * -->
+    <!-- * Information about Payment Method, i.e. Bankacct, Creditcard 1,    * -->
+    <!-- * Creditcard 2 etc.                                                 * -->
+    <!-- * TBD later                                                         * -->
+    <!-- *                                                                   * -->
+    <!-- ********************************************************************* -->
+    <complexType name="paymentInfoType">
+        <sequence>
+            <element name="paymentType" type="gsph-cust:paymentTypeType"/>
+            <element name="bankacct" type="gsph-cust:bankacctType" minOccurs="0"/>
+            <element name="ccno1" type="gsph-cust:ccnoType" minOccurs="0"/>
+            <element name="ccno2" type="gsph-cust:ccnoType" minOccurs="0"/>
+            <element name="sepaOwnerAddress" type="gsph-cust:addressType" minOccurs="0" maxOccurs="1"/>
+            <element name="sepaOwnerPerson" type="gsph-cust:personAttributesType" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="bankacctType">
+        <annotation>
+            <documentation>Type Definition for Bank Account Information</documentation>
+        </annotation>
+        <sequence>
+            <element name="acctno" type="string"/>
+            <element name="bankcode" type="string"/>
+            <element name="bankname" type="string"/>
+	    
+<!--        <element name="sepamandantref" type="string" minOccurs="0" maxOccurs="1"/>
+            <element name="sepacontractident" type="string" minOccurs="0" maxOccurs="1"/>
+            <element name="sepacontractdesc" type="string" minOccurs="0" maxOccurs="1"/>
+            <element name="sepapaymenttype" type="string" minOccurs="0" maxOccurs="1"/>
+-->
+            <element name="sepamandatref" type="string" minOccurs="0" maxOccurs="1"/>
+            <element name="sepamandatdate" type="date" minOccurs="0" maxOccurs="1"/>
+            <element name="sepamandatstatus" type="gsph-cust:mandatStatusType" minOccurs="0" maxOccurs="1"/>
+            <element name="sepaprenotification" type="unsignedShort" minOccurs="0" maxOccurs="1"/>
+
+            <element name="sepaiban" type="string" minOccurs="0" maxOccurs="1"/>
+            <element name="sepabic" type="string" minOccurs="0" maxOccurs="1"/>
+
+            <element name="sepacreditoridentifier" type="string" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+    </complexType>
+    
+    <complexType name="ccnoType">
+      <annotation>
+        <documentation>Type Definition for Credit Card Information</documentation>
+      </annotation>
+      <sequence>
+            <element name="cardtype" type="unsignedShort"/>
+            <element name="cardno" type="string"/>
+            <element name="cardname" type="string"/>
+            <element name="cardvaliduntil" type="date"/>
+      </sequence>
+    </complexType>
+    
+    <complexType name="admissionType">
+      <sequence>
+        <element name="facility" minOccurs="0" maxOccurs="1" type="unsignedShort"/>
+        <element name="mainfacility" minOccurs="0" maxOccurs="1" type="unsignedShort"/>
+        <element name="timeprofile" minOccurs="0" maxOccurs="1" type="unsignedByte"/>
+        <element name="timeprofallfty" minOccurs="0" maxOccurs="1" type="gsph-cust:timeprofallftyType"/>
+        <element name="timeprofadm" minOccurs="0" maxOccurs="1" type="gsph-cust:timeprofadmType"/>
+        <element name="timeprofchrg" minOccurs="0" maxOccurs="1" type="gsph-cust:timeprofchrgType"/>
+        <element name="countreserved" minOccurs="0" maxOccurs="1" type="gsph-cust:countreservedType"/>
+      </sequence>
+    </complexType>
+
+    <complexType name="loyaltyType">
+      <sequence>  
+        <element name="customerId" minOccurs="1" maxOccurs="1" type="string"/>
+        <element name="product" minOccurs="0" maxOccurs="1" type="unsignedLong"/>
+        <element name="lastbookingdate" minOccurs="0" maxOccurs="1" type="date"/>
+      </sequence>
+    </complexType>
+    
+    <complexType name="poolingType">
+      <sequence>  
+        <element name="poolingDetail" type="gsph-cust:poolingDetailType" minOccurs="0" maxOccurs="unbounded"/>
+      </sequence>
+    </complexType>
+    
+    <complexType name="poolingDetailType">
+      <sequence>  
+        <element name="facility" minOccurs="0" maxOccurs="1" type="int"/>
+        <element name="extCardProfile" minOccurs="0" maxOccurs="1" type="int"/>
+        <element name="maxCounter" minOccurs="0" maxOccurs="1" type="short"/>
+        <element name="presentCounter" minOccurs="0" maxOccurs="1" type="short"/>
+        <element name="overruns" minOccurs="0" maxOccurs="1" type="short"/>
+        <element name="maxAssigned" minOccurs="0" maxOccurs="1" type="short"/>
+        <element name="currentlyAssigned" minOccurs="0" maxOccurs="1" type="short"/>
+        <element name="poolingType" minOccurs="0" maxOccurs="1" type="short"/>
+        <element name="poolingProfile" minOccurs="0" maxOccurs="1" type="int"/>
+      </sequence>
+    </complexType>
+
+    <simpleType name="genderType">
+        <restriction base="string">
+            <pattern value="male|female"/>
+        </restriction>
+    </simpleType>
+    
+    <simpleType name="invoiceJobTypeType">
+        <restriction base="string">
+            <pattern value="invoice|reminder|clearing"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="paymentTypeType">
+        <restriction base="unsignedShort">
+            <enumeration value="0">
+              <annotation>
+                <documentation>0 = Pay Cash</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="1">
+              <annotation>
+                <documentation>1 = Remittance (Ueberweisung)</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="2">
+              <annotation>
+                <documentation>2 = Bank Collection (Bankeinzug)</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="8">
+              <annotation>
+                <documentation>8 = Credit Card</documentation>
+              </annotation>
+            </enumeration>
+			<enumeration value="10">
+              <annotation>
+                <documentation>10 = SEPA CORE</documentation>
+              </annotation>
+            </enumeration>
+			<enumeration value="11">
+              <annotation>
+                <documentation>11 = SEPA COR1</documentation>
+              </annotation>
+            </enumeration>
+			<enumeration value="12">
+              <annotation>
+                <documentation>12 = SEPA B2B</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="100"/>
+            <enumeration value="101"/>
+            <enumeration value="110"/>
+            <enumeration value="111"/>
+            <enumeration value="112"/>
+            <enumeration value="120"/>
+            <enumeration value="121"/>
+            <enumeration value="122"/>
+            <enumeration value="123"/>
+            <enumeration value="124"/>
+            <enumeration value="125"/>
+            <enumeration value="126"/>
+            <enumeration value="129"/>
+            <enumeration value="130"/>
+            <enumeration value="131"/>
+            <enumeration value="132"/>
+            <enumeration value="139"/>
+            <enumeration value="140"/>
+            <enumeration value="141"/>
+            <enumeration value="149"/>
+            <enumeration value="150"/>
+            <enumeration value="151"/>
+            <enumeration value="152"/>
+            <enumeration value="159"/>
+        </restriction>
+    </simpleType>
+    
+    <simpleType name="contractIdType">
+       <restriction base="unsignedLong">
+                    <minInclusive value="1"/>
+                    <maxInclusive value="99999"/>
+       </restriction>
+    </simpleType>
+    
+    <simpleType name="consumerIdType">
+       <restriction base="unsignedLong">
+                    <minInclusive value="1"/>
+                    <maxInclusive value="99999"/>
+       </restriction>
+    </simpleType>
+    
+    <simpleType name="counterType">
+        <annotation>
+            <documentation>
+                counterType defines the possible settings for contract counting.
+                The maximum value is 9998!
+                Setting this value to 9999 means contract counting is turned off
+            </documentation>
+        </annotation>
+        <restriction base="unsignedShort">
+             <minInclusive value="1"/>
+             <maxInclusive value="9999"/>
+        </restriction>
+    </simpleType>
+        
+    <simpleType name="vatType">
+          <restriction base="string">
+              <enumeration value="A"/>
+              <enumeration value="B"/>
+              <enumeration value="C"/>
+              <enumeration value="D"/>
+              <enumeration value="E"/>
+              <enumeration value="F"/>
+              <enumeration value="Z"/>
+          </restriction>
+    </simpleType>
+    
+    <simpleType name="transactionType">
+      <annotation>
+        <documentation>
+            List of transaction types occuring in the list of
+            season parker transactions
+        </documentation>
+      </annotation>
+      <restriction base="unsignedShort">
+            <enumeration value="1">
+              <annotation>
+                <documentation>1 = Entry reserved</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="2">
+              <annotation>
+                <documentation>2 = Entry not reserved</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="11">
+              <annotation>
+                <documentation>11 = Exit reserved</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="12">
+              <annotation>
+                <documentation>12 = Exit not reserved</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="21">
+              <annotation>
+                <documentation>21 = Passage reserved/reserved</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="22">
+              <annotation>
+                <documentation>22 = Passage not reserved/not reserved</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="23">
+              <annotation>
+                <documentation>23 = Passage reserved/not reserved</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="24">
+              <annotation>
+                <documentation>24 = Passage not reserved/reserved</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="42">
+             <annotation>
+                <documentation>42 = Payment</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="43">
+             <annotation>
+                <documentation>43 = add. Payment</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="46">
+             <annotation>
+                <documentation>46 = Production CCC</documentation>
+              </annotation>
+            </enumeration>
+        </restriction>
+    </simpleType>
+    
+    <simpleType name="timeprofadmType">
+      <restriction base="unsignedShort">
+        <enumeration value="0">
+          <annotation>
+            <documentation>Entry always permitted</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="1">
+          <annotation>
+            <documentation>Entry only within time profile</documentation>
+          </annotation>
+        </enumeration>
+      </restriction>
+    </simpleType>
+    
+    <simpleType name="timeprofallftyType">
+      <restriction base="unsignedShort">
+        <enumeration value="0">
+          <annotation>
+            <documentation>Time profile validity depends on facility</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="1">
+          <annotation>
+            <documentation>Time profile is valid in all facilities</documentation>
+          </annotation>
+        </enumeration>
+      </restriction>
+    </simpleType>
+    
+    <simpleType name="timeprofchrgType">
+      <restriction base="unsignedShort">
+        <enumeration value="0">
+          <annotation>
+            <documentation>Charge every stay</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="1">
+          <annotation>
+            <documentation>Charge stay not in time profile</documentation>
+          </annotation>
+        </enumeration>
+      </restriction>
+    </simpleType>
+    
+    <simpleType name="countreservedType">
+      <restriction base="unsignedShort">
+        <enumeration value="0">
+          <annotation>
+            <documentation>Count not reserved</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="1">
+          <annotation>
+            <documentation>Count reserved</documentation>
+          </annotation>
+        </enumeration>
+      </restriction>
+    </simpleType>
+    
+    <simpleType name="string1">
+		<restriction base="string">
+			<maxLength value="1"/>
+			<minLength value="0"/>
+		</restriction>
+	</simpleType>
+    <simpleType name="string9">
+		<restriction base="string">
+			<maxLength value="9"/>
+			<minLength value="0"/>
+		</restriction>
+	</simpleType>
+    <simpleType name="string15">
+		<restriction base="string">
+			<maxLength value="15"/>
+			<minLength value="0"/>
+		</restriction>
+	</simpleType>
+    <simpleType name="string20">
+		<restriction base="string">
+			<maxLength value="20"/>
+			<minLength value="0"/>
+		</restriction>
+	</simpleType>
+    <simpleType name="string23">
+		<restriction base="string">
+			<maxLength value="23"/>
+			<minLength value="0"/>
+		</restriction>
+	</simpleType>
+    <simpleType name="string25">
+		<restriction base="string">
+			<maxLength value="25"/>
+			<minLength value="0"/>
+		</restriction>
+	</simpleType>
+    <simpleType name="string31">
+		<restriction base="string">
+			<maxLength value="31"/>
+			<minLength value="0"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="string32">
+		<restriction base="string">
+			<maxLength value="32"/>
+			<minLength value="0"/>
+		</restriction>
+	</simpleType>
+    <simpleType name="string33">
+		<restriction base="string">
+			<maxLength value="33"/>
+			<minLength value="0"/>
+		</restriction>
+	</simpleType>
+    <simpleType name="string50">
+		<restriction base="string">
+			<maxLength value="50"/>
+			<minLength value="0"/>
+		</restriction>
+	</simpleType>
+    <simpleType name="string51">
+		<restriction base="string">
+			<maxLength value="51"/>
+			<minLength value="0"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="string128">
+		<restriction base="string">
+			<maxLength value="128"/>
+			<minLength value="0"/>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="mandatStatusType">
+	  <annotation>
+	    <documentation>
+                       0 = Initial SEPA Bank Collection
+                       1 = Subsequent SEPA Bank Collection
+                       2 = Last SEPA Bank Collection
+                       3 = Single SEPA Bank Collection
+            </documentation>
+	  </annotation>
+	  <restriction base="unsignedShort">
+            <enumeration value="0">
+              <annotation>
+                <documentation>0 = Initial SEPA Bank Collection</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="1">
+              <annotation>
+                <documentation>1 = Subsequent SEPA Bank Collection</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="2">
+              <annotation>
+                <documentation>2 = Last SEPA Bank Collection</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="3">
+              <annotation>
+                <documentation>3 = Single SEPA Bank Collection</documentation>
+              </annotation>
+            </enumeration>
+        </restriction>
+    </simpleType>
+    
+	<simpleType name="discountType">
+	  <annotation>
+	    <documentation>
+            0 = No discount
+            1 = Percentage
+            2 = Per unit
+            3 = Frequent parker
+        </documentation>
+	  </annotation>
+	  <restriction base="unsignedShort">
+        <enumeration value="0">
+          <annotation>
+            <documentation>0 = No discount</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="1">
+          <annotation>
+            <documentation>1 = Percentage</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="2">
+          <annotation>
+            <documentation>2 = Per unit</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="3">
+          <annotation>
+            <documentation>3 = Frequent parker</documentation>
+          </annotation>
+        </enumeration>
+        </restriction>
+    </simpleType>
+
+	<simpleType name="feeTypeType">
+	  <annotation>
+	    <documentation>
+            0 = No fee
+            1 = Fee 1 per invoice
+            2 = Fee 2 per invoice
+            3 = Fee 3 per invoice
+        </documentation>
+	  </annotation>
+	  <restriction base="unsignedShort">
+        <enumeration value="0">
+          <annotation>
+            <documentation>0 = No fee</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="1">
+          <annotation>
+            <documentation>1 = Fee 1 per invoice</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="2">
+          <annotation>
+            <documentation>2 = Fee 2 per invoice</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="3">
+          <annotation>
+            <documentation>3 = Fee 3 per invoice</documentation>
+          </annotation>
+        </enumeration>
+        </restriction>
+    </simpleType>    
+
+	<simpleType name="flatFeeTypeType">
+	  <annotation>
+	    <documentation>
+            0 = Monthly fee
+            1 = Annual fee
+            2 = Semi-annual fee
+            3 = Quarterly fee
+        </documentation>
+	  </annotation>
+	  <restriction base="unsignedShort">
+        <enumeration value="0">
+          <annotation>
+            <documentation>0 = Monthly fee</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="1">
+          <annotation>
+            <documentation>1 = Annual fee</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="2">
+          <annotation>
+            <documentation>2 = Semi-annual fee</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="3">
+          <annotation>
+            <documentation>3 = Quarterly fee</documentation>
+          </annotation>
+        </enumeration>
+        </restriction>
+    </simpleType>         
+
+	<simpleType name="flatFeeCalcType">
+	  <annotation>
+	    <documentation>
+            0 = Start
+            1 = Prepayment
+            2 = Half-time
+            3 = End
+            4 = Pay in arrear
+        </documentation>
+	  </annotation>
+	  <restriction base="unsignedShort">
+        <enumeration value="0">
+          <annotation>
+            <documentation>0 = Start</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="1">
+          <annotation>
+            <documentation>1 = Prepayment</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="2">
+          <annotation>
+            <documentation>2 = Half-time</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="3">
+          <annotation>
+            <documentation>3 = End</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="4">
+          <annotation>
+            <documentation>4 = Pay in arrear</documentation>
+          </annotation>
+        </enumeration>
+        </restriction>
+    </simpleType>    
+        
+	<simpleType name="flatFeeFirstMonthType">
+	  <annotation>
+	    <documentation>
+            0 = Charge 50% for the first flat fee
+            1 = Charge 100% for the first flat fee
+            2 = Charge proportionately for the first flat fee
+        </documentation>
+	  </annotation>
+	  <restriction base="unsignedShort">
+        <enumeration value="0">
+          <annotation>
+            <documentation>0 = Charge 50% for the first flat fee</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="1">
+          <annotation>
+            <documentation>1 = Charge 100% for the first flat fee</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="2">
+          <annotation>
+            <documentation>2 = Charge proportionately for the first flat fee</documentation>
+          </annotation>
+        </enumeration>
+        </restriction>
+    </simpleType>
+
+ 	<simpleType name="flatFeeLastMonthType">
+	  <annotation>
+	    <documentation>
+            0 = Charge 50% for the last flat fee
+            1 = Charge 100% for the last flat fee
+            2 = Charge proportionately for the last flat fee
+        </documentation>
+	  </annotation>
+	  <restriction base="unsignedShort">
+        <enumeration value="0">
+          <annotation>
+            <documentation>0 = Charge 50% for the last flat fee</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="1">
+          <annotation>
+            <documentation>1 = Charge 100% for the last flat fee</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="2">
+          <annotation>
+            <documentation>2 = Charge proportionately for the last flat fee</documentation>
+          </annotation>
+        </enumeration>
+        </restriction>
+    </simpleType>
+
+ 	<simpleType name="invoiceTypeType">
+	  <annotation>
+	    <documentation>
+            0 = Normal (future not active)
+            1 = Best price
+            2 = Frequent parker
+        </documentation>
+	  </annotation>
+	  <restriction base="unsignedShort">
+        <enumeration value="0">
+          <annotation>
+            <documentation>0 = Normal (future not active)</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="1">
+          <annotation>
+            <documentation>1 = Best price active</documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="2">
+          <annotation>
+            <documentation>2 = Frequent parker feature is active</documentation>
+          </annotation>
+        </enumeration>
+        </restriction>
+    </simpleType>
+
+</schema>

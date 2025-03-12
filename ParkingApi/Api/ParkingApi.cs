@@ -8,10 +8,8 @@ using RestSharp.Serializers.NewtonsoftJson;
 using RestSharp.Serializers.Xml;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
-using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -188,12 +186,13 @@ namespace Entrvo.Services
     }
 
 
-    public async Task<int> CreateConsumerAsync(ConsumerDetails consumer, CancellationToken cancellationToken = default)
+    public async Task<int> CreateConsumerAsync(int templateId, ConsumerDetails consumer, CancellationToken cancellationToken = default)
     {
       try
-      {
+      {        
         var contractId = consumer.Consumer.ContractId;
         var detailRequest = new RestRequest(@$"CustomerMediaWebService/contracts/{contractId}/consumers");
+        detailRequest.AddQueryParameter("templateId", templateId.ToString());
         detailRequest.AddXmlBody(consumer, xmlNamespace: "http://gsph.sub.com/cust/types");
         detailRequest.AddHeader("Accept", "application/json");
         detailRequest.Method = Method.Post;
@@ -375,6 +374,27 @@ namespace Entrvo.Services
         _logger.LogError(ex.ToString());
         throw;
       }
+    }
+    #endregion
+
+    #region UsageProfile
+    public async Task<UsageProfile[]> GetUsageProfilesAsync(CancellationToken cancellationToken = default)
+    {
+      try
+      {
+        var request = new RestRequest($"CustomerMediaWebService/profiles");
+        request.AddHeader("Accept", "application/json");
+        request.Method = Method.Get;
+        var response = await _client.ExecuteGetAsync(request, cancellationToken);
+        var result = JsonConvert.DeserializeObject<ProfileListResponse>(response.Content);
+        return result.Result.Profiles;
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex.ToString());
+        throw;
+      }
+
     }
     #endregion
 

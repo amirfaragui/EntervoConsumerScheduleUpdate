@@ -5,7 +5,7 @@ using Entrvo.DAL.Attributes;
 
 namespace Entrvo.DAL
 {
-  public class Email: IDataEntity
+  public class Email: IDataEntity<int>
   {
     public int CustomerUID { get; set; }
     [Range(1, 100)]
