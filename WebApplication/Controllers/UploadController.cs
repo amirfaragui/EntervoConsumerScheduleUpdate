@@ -14,22 +14,25 @@ namespace Entrvo.Controllers
     private readonly ApplicationDbContext _context;
     private readonly IWebHostEnvironment _hostingEnvironment;
     private readonly IScheduleService _scheduleService;
+    private readonly IEntrvoService _entrvoService;
     private readonly ILogger<UploadController> _logger;
 
     public UploadController(ApplicationDbContext context,
-                            IWebHostEnvironment hostingEnvironment, 
+                            IWebHostEnvironment hostingEnvironment,
+                            IEntrvoService entrvoService,
                             IScheduleService scheduleService, 
                             ILogger<UploadController> logger)
     {
       _context = context;
       _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
       _scheduleService = scheduleService ?? throw new ArgumentNullException(nameof(scheduleService));
+      _entrvoService = entrvoService ?? throw new ArgumentNullException(nameof(entrvoService));
       _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public IActionResult Index()
     {
-      var model = new UploadModel() { FirstLineHeader = true };
+      var model = new UploadModel() { FirstLineHeader = false, Delimiter = "," };
       return View(model);
     }
 
@@ -78,19 +81,24 @@ namespace Entrvo.Controllers
     [HttpPost]
     public async Task<IActionResult> Process(UploadModel model)
     {
-      model.TimeStamp = DateTime.Now;
-      var response = new UploadResponse();
-      try
-      {
-        var result = await _scheduleService.AddManualFileParsingJob(model);
-        response.JobId = result.JobId;
-        response.Success = true;
-      }
-      catch (Exception ex)
-      {
-        response.Message = ex.Message;
-      }
-      return Ok(response);
+      //model.TimeStamp = DateTime.Now;
+      //var response = new UploadResponse();
+      //try
+      //{
+      //  var result = await _scheduleService.AddManualFileParsingJob(model);
+      //  response.JobId = result.JobId;
+      //  response.Success = true;
+      //}
+      //catch (Exception ex)
+      //{
+      //  response.Message = ex.Message;
+      //}
+      //return Ok(response);
+
+      var fileName = Path.Combine(_hostingEnvironment.WebRootPath, "App_Data", model.FileName);
+
+      await _entrvoService.Enqueue(fileName);
+      return Ok();
     }
 
     public async Task<IActionResult> Chunk_Upload_Save(IEnumerable<IFormFile> files, string metaData)

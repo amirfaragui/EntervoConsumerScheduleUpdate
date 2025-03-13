@@ -31,6 +31,7 @@ namespace Entrvo.Services
     private readonly ISettingsService _settings;
     private readonly IWebHostEnvironment _environment;
     private string _baseDirectory;
+    private bool _includeSubdirectories;
     #endregion
 
 
@@ -48,6 +49,7 @@ namespace Entrvo.Services
 
       _filteredFileTypes = [.. options.FileTypes.Select(i => i.Replace("*", string.Empty))];
       _baseDirectory = options.BaseDirectory;
+      _includeSubdirectories = options.IncludeSubdirectories;
     }
 
     #region events
@@ -77,7 +79,7 @@ namespace Entrvo.Services
 
       //watcher.Path = folder;
       _watcher.EnableRaisingEvents = false;
-      _watcher.IncludeSubdirectories = true;
+      _watcher.IncludeSubdirectories = _includeSubdirectories;
       _watcher.InternalBufferSize = 32768; //32KB
 
       _watcher.Path = FSWSource;

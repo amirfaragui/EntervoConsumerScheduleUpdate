@@ -10,11 +10,13 @@ namespace Entrvo.Services
   {
     string BaseDirectory { get; set; }
     IEnumerable<string> FileTypes { get; set; }
+    bool IncludeSubdirectories { get; set; }
   }
 
   public class FilesWatchOptions: IFilesWatchOptions
   {
     public string BaseDirectory { get; set; }
     public IEnumerable<string> FileTypes { get; set; }
+    public bool IncludeSubdirectories { get; set; }
   }
 }

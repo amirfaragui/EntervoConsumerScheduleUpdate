@@ -24,6 +24,10 @@
 
   .red {
     background-color: crimson;
+    color: white;
+  }
+  .red:hover {
+    color: black
   }
 
   .green {
@@ -37,7 +41,7 @@ Html.Kendo().ToolBar()
   .Name("ToolBar")
   .Items(items =>
   {
-    items.Add().Type(CommandType.SplitButton).Text("Consumers").Icon("data").MenuButtons(mb =>
+@*     items.Add().Type(CommandType.SplitButton).Text("Consumers").Icon("data").MenuButtons(mb =>
     {
       mb.Add().Text("Download").Icon("download").Id("downloadConsumers");
       mb.Add().Text("Update").Icon("upload").Id("uploadConsumers");
@@ -50,8 +54,8 @@ Html.Kendo().ToolBar()
     {
       mb.Add().Text("Payroll deduction file").Icon("file-csv").Id("generate04File");
       mb.Add().Text("Payroll export file").Icon("file-csv").Id("generate01File");
-    }).Click("onExportClicked");
-    items.Add().Type(CommandType.Spacer);
+    }).Click("onExportClicked"); *@
+    @* items.Add().Type(CommandType.Spacer); *@
     items.Add().Type(CommandType.Button).Text("Clear").Icon("trash").Click("onEmpty").HtmlAttributes(new { @class = "red"});
   })
 )

@@ -65,6 +65,13 @@ namespace Entrvo.Services
       var importer = scope.ServiceProvider.GetRequiredService<IEntrvoConsumerService>();
       var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
+      var settings = await _settingsService.LoadSettingsAsync();
+      var backupFolder = settings.DataFolder.BackupFolder;
+      var fileName = Path.GetFileNameWithoutExtension(file);
+      var ext = Path.GetExtension(file);
+      var backupFile = Path.Combine(backupFolder, $"{fileName}-{DateTime.Now:yyMMddHHmm}{ext}");
+
+
       var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
       var properties = typeof(EntrvoRecord).GetProperties(BindingFlags.Public | BindingFlags.Instance).ToArray();
@@ -120,15 +127,14 @@ namespace Entrvo.Services
                 dbItem.ValidUntil = validUntil;
               }
 
-              var fileName = Path.GetFileName(file);
               var evt = new Event()
               {
                 Time = DateTime.Now,                
-                Message = $"Consumer {dbItem.CardNumber} updated from file '{file}'.",
+                Message = $"Consumer {dbItem.CardNumber} updated from file '{Path.GetFileName(file)}'.",
                 Details = data.ToString(),
                 Type =  JobType.ConsumerUpdate,
                 ConsumerId = dbItem.Id,
-                FileUrl = file,
+                FileUrl = backupFile,
               };
               context.Events.Add(evt);
 
@@ -151,13 +157,8 @@ namespace Entrvo.Services
       }
 
       #region Backup file
-      var settings = await _settingsService.LoadSettingsAsync();
-      var backupFolder = settings.DataFolder.BackupFolder;
       if (!string.IsNullOrEmpty(backupFolder) && Directory.Exists(backupFolder))
       {
-        var fileName = Path.GetFileNameWithoutExtension(file);
-        var ext = Path.GetExtension(file);
-        var backupFile = Path.Combine(backupFolder, $"{fileName}-{DateTime.Now:yyMMddHHmm}{ext}");
         if (File.Exists(backupFile))
         {
           File.Delete(backupFile);

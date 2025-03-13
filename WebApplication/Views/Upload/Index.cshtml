@@ -101,8 +101,8 @@ Html.Kendo().Wizard()
         if (data.Success === true) {
           var href = new URL(window.location.href);
           var baseURL =  `${href.protocol}//${href.host}`;
-          var request = new URL('@Url.Action("progress", "upload")', baseURL);
-          request.searchParams.append("jobId", encodeURIComponent(data.JobId));
+          var request = new URL('@Url.Action("index", "dashboard")', baseURL);
+          //request.searchParams.append("jobId", encodeURIComponent(data.JobId));
           done = true;
           window.location.href = request.href;
         }

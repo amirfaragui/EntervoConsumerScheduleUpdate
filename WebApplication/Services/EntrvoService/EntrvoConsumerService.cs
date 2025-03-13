@@ -78,6 +78,7 @@ namespace EntrvoWebApp.Services
           }
 
           var consumerId = await _api.CreateConsumerAsync(templateId, consumer, cancellationToken);
+          consumer.Consumer.Id = consumerId.ToString();
           _logger.LogInformation("Created consumer {ConsumerId} for card {CardNumber}", consumerId, cardNumber);
         }
         else

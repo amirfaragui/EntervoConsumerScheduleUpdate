@@ -142,6 +142,7 @@ builder.Services.AddFileWatcherService(options =>
 {
   options.BaseDirectory = "App_Data";
   options.FileTypes = ["*.csv", "*.txt"];
+  options.IncludeSubdirectories = false;
 });
 builder.Services.AddEntrvoService();
 

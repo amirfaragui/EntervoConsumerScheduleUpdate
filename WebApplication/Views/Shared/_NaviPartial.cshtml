@@ -15,7 +15,7 @@
   <items>
     <panelbar-item text="Dashboard" href="/dashboard" selected=@NavPages.IsDashboardSelected(ViewContext)></panelbar-item>
 
-    <panelbar-item text="Customers" expanded=@NavPages.IsCustomersExpanded(ViewContext)>
+@*     <panelbar-item text="Customers" expanded=@NavPages.IsCustomersExpanded(ViewContext)>
       <items>
         <panelbar-item text="List" href="/customers/index" selected=@NavPages.IsCustomerListSelected(ViewContext)></panelbar-item>
         <panelbar-item text="Details" href="/customers/edit" selected=@NavPages.IsCustomerEditSelected(ViewContext)></panelbar-item>
@@ -27,7 +27,7 @@
         <panelbar-item text="List" href="/permits/index" selected=@NavPages.IsPermitListSelected(ViewContext)></panelbar-item>
         <panelbar-item text="Details" href="/customers/edit" selected=@NavPages.IsPermitEditSelected(ViewContext)></panelbar-item>
       </items>
-    </panelbar-item>
+    </panelbar-item> *@
 
     <panelbar-item text="Consumers" expanded=@NavPages.IsConsumersExpanded(ViewContext)>
       <items>
@@ -36,14 +36,14 @@
       </items>
     </panelbar-item>
 
-    <panelbar-item text="Import Data" expanded=@NavPages.IsImportExpanded(ViewContext)>
+@*     <panelbar-item text="Import Data" expanded=@NavPages.IsImportExpanded(ViewContext)>
       <items>
         <panelbar-item text="Customers" href="/customers/import" selected=@NavPages.IsCustomersImportSelected(ViewContext)></panelbar-item>
         <panelbar-item text="Permits" href="/permits/import" selected=@NavPages.IsPermitsImportSelected(ViewContext)></panelbar-item>
         <panelbar-item text="Emails" href="/emails/import" selected=@NavPages.IsEmailsImportSelected(ViewContext)></panelbar-item>
         <panelbar-item text="Notes" href="/notes/import" selected=@NavPages.IsNotesImportSelected(ViewContext)></panelbar-item>
       </items>
-    </panelbar-item>
+    </panelbar-item> *@
 
     <panelbar-item text="History" href="/history" selected=@NavPages.IsHistorySelected(ViewContext)></panelbar-item>
 
