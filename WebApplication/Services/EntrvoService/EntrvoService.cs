@@ -86,6 +86,14 @@ namespace Entrvo.Services
         mappings[i].Index = i + 1;
       }
 
+      var endValidity = mappings.FirstOrDefault(i => i.Name == "EndValidity");
+      if (endValidity != null)
+      {
+        endValidity.Format = "yyyyMMdd";
+      }
+
+      var unlimitedEndDate = new DateTime(1900, 1, 1);
+
       var model = new ImportSourceModel
       {
         FileName = file,
@@ -99,6 +107,8 @@ namespace Entrvo.Services
         _logger.LogInformation($"Parsed {data}");
         try
         {
+          if (data.EndValidity == unlimitedEndDate) data.EndValidity = null;
+          
           var consumer = await importer.UpdateConsumerAsync(data, cts.Token);
           if (consumer != null)
           {

@@ -99,6 +99,7 @@ namespace EntrvoWebApp.Services
 
           if (record.AccessProfile != null && record.AccessProfile.Contains("PPU"))
           {
+            consumer.Lpn2 = "PPU";
             if (int.TryParse(consumer.Lpn3, out var oldValue) && int.TryParse(record.AdditionalValue, out var newValue))
             {
               consumer.Lpn3 = (oldValue + newValue).ToString();
