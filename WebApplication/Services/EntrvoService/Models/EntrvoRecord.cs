@@ -39,10 +39,11 @@ namespace EntrvoWebApp.Services.Models
     {
       if (string.IsNullOrEmpty(CardNumber)) return null;
       var cardNumberString = CardNumber.Trim();
-      //var siteCode = cardNumberString?[..3];
-      var siteCode = cardNumberString.Substring(0, cardNumberString.Length - 5);
-      //      var cardNumber = cardNumberString?[3..] ?? string.Empty;
-      var cardNumber = cardNumberString.Substring(siteCode.Length) ;
+    
+     var siteCode = cardNumberString?[..(cardNumberString.Length - 5)];
+    
+      var cardNumber = cardNumberString?[(siteCode.Length)..] ?? string.Empty;
+      
 
       return siteCode + cardNumber.PadLeft(8, '0');
     }
