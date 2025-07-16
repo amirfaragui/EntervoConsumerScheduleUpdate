@@ -38,8 +38,11 @@ namespace EntrvoWebApp.Services.Models
     public string? GetId()
     {
       if (string.IsNullOrEmpty(CardNumber)) return null;
-      var siteCode = CardNumber?[..3];
-      var cardNumber = CardNumber?[3..] ?? string.Empty;
+      var cardNumberString = CardNumber.Trim();
+      //var siteCode = cardNumberString?[..3];
+      var siteCode = cardNumberString.Substring(0, cardNumberString.Length - 5);
+      //      var cardNumber = cardNumberString?[3..] ?? string.Empty;
+      var cardNumber = cardNumberString.Substring(siteCode.Length) ;
 
       return siteCode + cardNumber.PadLeft(8, '0');
     }

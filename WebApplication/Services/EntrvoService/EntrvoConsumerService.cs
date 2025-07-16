@@ -1,6 +1,7 @@
 ﻿using Entrvo.Api.Models;
 using Entrvo.Services;
 using EntrvoWebApp.Services.Models;
+using NuGet.Configuration;
 
 namespace EntrvoWebApp.Services
 {
@@ -21,32 +22,38 @@ namespace EntrvoWebApp.Services
 
     public async Task<ConsumerDetails?> UpdateConsumerAsync(EntrvoRecord record, CancellationToken cancellationToken)
     {
-      var cardNumber = record.GetId();
-      var filters = new Dictionary<ConsumerFilter, object>
-      {
-        { ConsumerFilter.Cardno, cardNumber }
-      };
-
       try
       {
+        var profile = await _accessProfileService.GetUsageProfileAsync(record.AccessProfile);
+
+        if (profile == null)
+        {
+          throw new Exception($"Access profile {record.AccessProfile} not found");
+        }
+
+        var settings = await _settingsService.LoadSettingsAsync();
+        var contractId = settings.Destination.ContractNumber;
+        var templateId = settings.Destination.TemplateNumber;
+
+        var cardNumber = record.GetId();
+        _logger.LogInformation($"Update Consumer => Padded card number is {cardNumber}");
+
+        var filters = new Dictionary<ConsumerFilter, object>
+        {
+          { ConsumerFilter.Cardno, cardNumber },
+          { ConsumerFilter.MinContractId, contractId },
+          { ConsumerFilter.MaxContractId, contractId },
+        };
+
         var consumer = await _api.FindConsumerDetailssAsync(filters, cancellationToken).FirstOrDefaultAsync(cancellationToken);
         if (consumer == null)
         {
-          var profile = await _accessProfileService.GetUsageProfileAsync(record.AccessProfile);
-
-          if (profile == null)
-          {
-            throw new Exception($"Access profile {record.AccessProfile} not found");            
-          }
-
-          var settings = await _settingsService.LoadSettingsAsync();
-          var contractId = settings.Destination.ContractNumber;
-          var templateId = settings.Destination.TemplateNumber;
 
           consumer = new ConsumerDetails()
           {
-            Consumer = new Consumer {
-              ContractId = contractId.ToString(), 
+            Consumer = new Consumer
+            {
+              ContractId = contractId.ToString(),
               ValidFrom = record.StartValidity?.ToString("yyyy-MM-dd"),
               ValidUntil = record.EndValidity?.ToString("yyyy-MM-dd"),
             },
@@ -63,39 +70,61 @@ namespace EntrvoWebApp.Services
               Status = 0
             },
             Status = 0,
-            Lpn1 = record.LPN1,
-            Lpn2 = record.LPN2,
+          //  Lpn1 = record.LPN1,
+         //   Lpn2 = record.LPN2,
             Memo = $"{record.Note1}-{record.Note1Extended}".TrimEnd('-'),
-            UserField1 = record.Note2,
+            UserField1 = $"{record.Note2}-{record.LPN1}-{record.LPN2}",
             UserField2 = record.Note3,
+            
             FirstName = record.FirstName,
-            Surname = record.LastName,             
+            Surname = record.LastName,
           };
 
           if (record.AccessProfile != null && record.AccessProfile.Contains("PPU"))
           {
+            consumer.Lpn2 = "PPU";
             consumer.Lpn3 = record.AdditionalValue;
           }
+          else
+          {
+            consumer.Lpn2 = "Term";
+            consumer.Lpn3 = string.Empty;
+          }
 
-          var consumerId = await _api.CreateConsumerAsync(templateId, consumer, cancellationToken);
+            var consumerId = await _api.CreateConsumerAsync(templateId, consumer, cancellationToken);
           consumer.Consumer.Id = consumerId.ToString();
           _logger.LogInformation("Created consumer {ConsumerId} for card {CardNumber}", consumerId, cardNumber);
         }
         else
         {
-          consumer.Consumer.ValidFrom = record.StartValidity?.ToString("yyyy-MM-dd");
-          consumer.Consumer.ValidUntil = record.EndValidity?.ToString("yyyy-MM-dd");
-          consumer.Person.FirstName = record.FirstName;
-          consumer.Person.Surname = record.LastName;
-          consumer.Identification.ValidFrom = record.StartValidity?.ToString("yyyy-MM-dd");
-          consumer.Identification.ValidUntil = record.EndValidity?.ToString("yyyy-MM-dd");
-          consumer.Lpn1 = record.LPN1;
-          consumer.Lpn2 = record.LPN2;
-          consumer.Memo = $"{record.Note1}-{record.Note1Extended}".TrimEnd('-');
-          consumer.UserField1 = record.Note2;
-          consumer.UserField2 = record.Note3;
-          consumer.FirstName = record.FirstName;
-          consumer.Surname = record.LastName;
+          if (!string.IsNullOrWhiteSpace(record.FirstName))
+          {
+            consumer.Person.FirstName = record.FirstName;
+            consumer.FirstName = record.FirstName;
+          }
+          if (!string.IsNullOrWhiteSpace(record.LastName))
+          {
+            consumer.Person.Surname = record.LastName;
+            consumer.Surname = record.LastName;
+          }
+        //  if (!string.IsNullOrWhiteSpace(record.LPN1)) consumer.Lpn1 = record.LPN1;
+       //   if (!string.IsNullOrWhiteSpace(record.LPN2)) consumer.Lpn2 = record.LPN2;
+          if (!string.IsNullOrWhiteSpace(record.Note1)) consumer.Memo = $"{record.Note1}-{record.Note1Extended}".TrimEnd('-');
+          if (!string.IsNullOrWhiteSpace(record.Note2)) consumer.UserField1 = $"{record.Note2}-{record.LPN1}-{record.LPN2}";
+          if (!string.IsNullOrWhiteSpace(record.Note3)) consumer.UserField2 = record.Note3;
+
+          consumer.Identification.UsageProfile = profile!;
+
+          if (record.StartValidity.HasValue)
+          {
+            consumer.Identification.ValidFrom = record.StartValidity.Value.ToString("yyyy-MM-dd");
+            consumer.Consumer.ValidFrom = record.StartValidity.Value.ToString("yyyy-MM-dd");
+          }
+          if (record.EndValidity.HasValue)
+          {
+            consumer.Identification.ValidUntil = record.EndValidity.Value.ToString("yyyy-MM-dd");
+            consumer.Consumer.ValidUntil = record.EndValidity.Value.ToString("yyyy-MM-dd");
+          }
 
           if (record.AccessProfile != null && record.AccessProfile.Contains("PPU"))
           {
@@ -105,8 +134,12 @@ namespace EntrvoWebApp.Services
               consumer.Lpn3 = (oldValue + newValue).ToString();
             }
           }
-
-          await _api.UpdateConsumerAsync(consumer, cancellationToken);
+          else
+          {
+            consumer.Lpn2 = "Term";
+            consumer.Lpn3 = string.Empty;
+          }
+            await _api.UpdateConsumerAsync(consumer, cancellationToken);
           _logger.LogInformation($"Updated consumer {consumer.Consumer.Id} for card {cardNumber}");
         }
 
@@ -119,5 +152,88 @@ namespace EntrvoWebApp.Services
 
       return null;
     }
+
+    public async Task<ConsumerDetails?> UpdateConsumerAsync(string contractId, string consumerId, EntrvoRecord record, CancellationToken cancellationToken)
+    {
+      try
+      {
+        var profile = await _accessProfileService.GetUsageProfileAsync(record.AccessProfile);
+
+        if (profile == null)
+        {
+          throw new Exception($"Access profile {record.AccessProfile} not found");
+        }
+
+        var settings = await _settingsService.LoadSettingsAsync();
+        var templateId = settings.Destination.TemplateNumber;
+
+        var cardNumber = record.GetId();
+
+
+        var consumer = await _api.GetConsumerDetailsAsync(contractId, consumerId, cancellationToken);
+        if (consumer == null)
+        {
+          _logger.LogInformation($"UpdateConsumerAsync => consumer [{cardNumber}] not existing in entervo");
+          return await UpdateConsumerAsync(record, cancellationToken);
+        }
+        else
+        {
+          if (!string.IsNullOrWhiteSpace(record.FirstName))
+          {
+            consumer.Person.FirstName = record.FirstName;
+            consumer.FirstName = record.FirstName;
+          }
+          if (!string.IsNullOrWhiteSpace(record.LastName))
+          {
+            consumer.Person.Surname = record.LastName;
+            consumer.Surname = record.LastName;
+          }
+          if (!string.IsNullOrWhiteSpace(record.LPN1)) consumer.Lpn1 = record.LPN1;
+          if (!string.IsNullOrWhiteSpace(record.LPN2)) consumer.Lpn2 = record.LPN2;
+          if (!string.IsNullOrWhiteSpace(record.Note1)) consumer.Memo = $"{record.Note1}-{record.Note1Extended}".TrimEnd('-');
+          if (!string.IsNullOrWhiteSpace(record.Note2)) consumer.UserField1 = record.Note2;
+          if (!string.IsNullOrWhiteSpace(record.Note3)) consumer.UserField2 = record.Note3;
+
+          consumer.Identification.UsageProfile = profile!;
+
+          if (record.StartValidity.HasValue)
+          {
+            consumer.Consumer.ValidFrom = record.StartValidity.Value.ToString("yyyy-MM-dd");
+            consumer.Consumer.ValidFrom = record.StartValidity.Value.ToString("yyyy-MM-dd");
+          }
+          if (record.EndValidity.HasValue)
+          {
+            consumer.Consumer.ValidUntil = record.EndValidity.Value.ToString("yyyy-MM-dd");
+            consumer.Consumer.ValidUntil = record.EndValidity.Value.ToString("yyyy-MM-dd");
+          }
+
+          if (record.AccessProfile != null && record.AccessProfile.Contains("PPU"))
+          {
+            consumer.Lpn2 = "PPU";
+            if (int.TryParse(consumer.Lpn3, out var oldValue) && int.TryParse(record.AdditionalValue, out var newValue))
+            {
+              consumer.Lpn3 = (oldValue + newValue).ToString();
+            }
+          }
+          else
+          {
+            consumer.Lpn2 = "Term";
+            consumer.Lpn3 = string.Empty;
+          }
+
+            await _api.UpdateConsumerAsync(consumer, cancellationToken);
+          _logger.LogInformation($"Updated consumer {consumer.Consumer.Id} for card {cardNumber}");
+        }
+
+        return consumer;
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex.ToString());
+      }
+
+      return null;
+    }
+
   }
 }

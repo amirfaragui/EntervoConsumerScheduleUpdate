@@ -67,7 +67,6 @@ namespace Entrvo.Services
         {
           { ConsumerFilter.MinContractId, settings.Destination.ContractNumber },
           { ConsumerFilter.MaxContractId, settings.Destination.ContractNumber },
-          { ConsumerFilter.Cardno, "123400000005" }
         };
         await foreach (var c in _client.FindConsumerDetailssAsync(filter, token))
         {

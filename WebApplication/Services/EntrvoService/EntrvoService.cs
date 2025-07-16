@@ -3,6 +3,7 @@ using Entrvo.Models;
 using Entrvo.Services.Models;
 using EntrvoWebApp.Services;
 using EntrvoWebApp.Services.Models;
+using Kendo.Mvc.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
 using System.Reflection;
@@ -107,21 +108,37 @@ namespace Entrvo.Services
         _logger.LogInformation($"Parsed {data}");
         try
         {
+          if (data.StartValidity == unlimitedEndDate) data.StartValidity = null;
           if (data.EndValidity == unlimitedEndDate) data.EndValidity = null;
-          
-          var consumer = await importer.UpdateConsumerAsync(data, cts.Token);
+
+          var cardNumber = data.GetId();
+          _logger.LogInformation($"File processing => Parsed card number {cardNumber}");
+          var dbItem = await context.Consumers.FirstOrDefaultAsync(i => i.CardNumber == cardNumber);
+          Api.Models.ConsumerDetails? consumer = null;
+          if (dbItem?.ConsumerId != null)
+          {
+            _logger.LogInformation($"File processing => exisitng consumer id {dbItem?.ConsumerId}");
+            consumer = await importer.UpdateConsumerAsync(dbItem.ContractId ?? settings.Destination.ContractNumber.ToString(),
+                                                          dbItem.ConsumerId!,
+                                                          data,
+                                                          cts.Token);
+          }
+          else
+          {
+            _logger.LogInformation($"File processing => not found consumer [{cardNumber}] on local DB");
+            consumer = await importer.UpdateConsumerAsync(data, cts.Token);
+          }
           if (consumer != null)
           {
             try
             {
-              var dbItem = await context.Consumers.FirstOrDefaultAsync(i => i.CardNumber == data.GetId());
               if (dbItem == null)
               {
                 dbItem = new Consumer();
                 context.Consumers.Add(dbItem);
               }
 
-              dbItem.CardNumber = data.GetId();
+              dbItem.CardNumber = cardNumber;
               dbItem.LPN1 = data.LPN1;
               dbItem.LPN2 = data.LPN2;
               dbItem.LPN3 = consumer.Lpn3;
@@ -139,10 +156,10 @@ namespace Entrvo.Services
 
               var evt = new Event()
               {
-                Time = DateTime.Now,                
+                Time = DateTime.Now,
                 Message = $"Consumer {dbItem.CardNumber} updated from file '{Path.GetFileName(file)}'.",
                 Details = data.ToString(),
-                Type =  JobType.ConsumerUpdate,
+                Type = JobType.ConsumerUpdate,
                 ConsumerId = dbItem.Id,
                 FileUrl = backupFile,
               };
