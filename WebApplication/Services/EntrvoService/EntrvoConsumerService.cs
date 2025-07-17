@@ -41,8 +41,8 @@ namespace EntrvoWebApp.Services
         var filters = new Dictionary<ConsumerFilter, object>
         {
           { ConsumerFilter.Cardno, cardNumber },
-          { ConsumerFilter.MinContractId, contractId },
-          { ConsumerFilter.MaxContractId, contractId },
+          { ConsumerFilter.MinContractId, 0 },
+          { ConsumerFilter.MaxContractId, 0 },
         };
 
         var consumer = await _api.FindConsumerDetailssAsync(filters, cancellationToken).FirstOrDefaultAsync(cancellationToken);
