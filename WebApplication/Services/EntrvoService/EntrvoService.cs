@@ -125,7 +125,7 @@ namespace Entrvo.Services
           }
           else
           {
-            _logger.LogInformation($"File processing => not found consumer [{cardNumber}] on local DB");
+            _logger.LogInformation($"File processing => not found consumer [{cardNumber}] in the local DB");
             consumer = await importer.UpdateConsumerAsync(data, cts.Token);
           }
           if (consumer != null)

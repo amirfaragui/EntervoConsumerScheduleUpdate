@@ -133,14 +133,27 @@ namespace EntrvoWebApp.Services
             {
               consumer.Lpn3 = (oldValue + newValue).ToString();
             }
+            if (!record.EndValidity.HasValue)
+            {
+              consumer.Identification.ValidUntil = DateTime.Today.AddYears(10).ToString("yyyy-MM-dd");
+              consumer.Consumer.ValidUntil = DateTime.Today.AddYears(10).ToString("yyyy-MM-dd");
+            }
           }
           else
           {
             consumer.Lpn2 = "Term";
             consumer.Lpn3 = string.Empty;
           }
-            await _api.UpdateConsumerAsync(consumer, cancellationToken);
-          _logger.LogInformation($"Updated consumer {consumer.Consumer.Id} for card {cardNumber}");
+          bool result =  await _api.UpdateConsumerAsync(consumer, cancellationToken);
+          if (result)
+          {
+            _logger.LogInformation($"Updated consumer {consumer.Consumer.Id} for card {cardNumber}");
+          }
+          else
+          {
+            _logger.LogInformation($"Unable to update consumer {consumer.Consumer.Id} for card {cardNumber}");
+           
+          }
         }
 
         return consumer;

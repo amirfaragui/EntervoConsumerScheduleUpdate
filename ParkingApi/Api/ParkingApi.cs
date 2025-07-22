@@ -221,7 +221,10 @@ namespace Entrvo.Services
         detailRequest.Method = Method.Put;
 
         var response = await _client.ExecutePutAsync<ConsumerDetailResponse>(detailRequest, cancellationToken);
-        //_logger.LogDebug(response.Content);
+        if (response.StatusCode != System.Net.HttpStatusCode.OK)
+        {
+           _logger.LogDebug($"UpdateConssumerASunc =>failed response status code [{response.StatusCode}], content [{response.Content}]");
+        }
         return response.StatusCode == System.Net.HttpStatusCode.OK;
       }
       catch (Exception ex)
