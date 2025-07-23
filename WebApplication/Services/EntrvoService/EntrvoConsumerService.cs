@@ -211,12 +211,12 @@ namespace EntrvoWebApp.Services
 
           if (record.StartValidity.HasValue)
           {
-            consumer.Consumer.ValidFrom = record.StartValidity.Value.ToString("yyyy-MM-dd");
+            consumer.Identification.ValidFrom = record.StartValidity.Value.ToString("yyyy-MM-dd");
             consumer.Consumer.ValidFrom = record.StartValidity.Value.ToString("yyyy-MM-dd");
           }
           if (record.EndValidity.HasValue)
           {
-            consumer.Consumer.ValidUntil = record.EndValidity.Value.ToString("yyyy-MM-dd");
+            consumer.Identification.ValidUntil = record.EndValidity.Value.ToString("yyyy-MM-dd");
             consumer.Consumer.ValidUntil = record.EndValidity.Value.ToString("yyyy-MM-dd");
           }
 
@@ -234,8 +234,16 @@ namespace EntrvoWebApp.Services
             consumer.Lpn3 = string.Empty;
           }
 
-            await _api.UpdateConsumerAsync(consumer, cancellationToken);
-          _logger.LogInformation($"Updated consumer {consumer.Consumer.Id} for card {cardNumber}");
+          bool result = await _api.UpdateConsumerAsync(consumer, cancellationToken);
+          if (result)
+          {
+            _logger.LogInformation($"Updated consumer {consumer.Consumer.Id} for card {cardNumber}");
+          }
+          else
+          {
+            _logger.LogInformation($"Unable to update consumer {consumer.Consumer.Id} for card {cardNumber}");
+
+          }
         }
 
         return consumer;
