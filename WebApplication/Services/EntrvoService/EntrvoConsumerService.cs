@@ -133,17 +133,20 @@ namespace EntrvoWebApp.Services
             {
               consumer.Lpn3 = (oldValue + newValue).ToString();
             }
-            if (!record.EndValidity.HasValue)
-            {
-              consumer.Identification.ValidUntil = DateTime.Today.AddYears(10).ToString("yyyy-MM-dd");
-              consumer.Consumer.ValidUntil = DateTime.Today.AddYears(10).ToString("yyyy-MM-dd");
-            }
+            
           }
           else
           {
             consumer.Lpn2 = "Term";
             consumer.Lpn3 = string.Empty;
           }
+          // if no end validity date, add 10 years from current time
+          if (!record.EndValidity.HasValue)
+          {
+            consumer.Identification.ValidUntil = DateTime.Today.AddYears(10).ToString("yyyy-MM-dd");
+            consumer.Consumer.ValidUntil = DateTime.Today.AddYears(10).ToString("yyyy-MM-dd");
+          }
+
           bool result =  await _api.UpdateConsumerAsync(consumer, cancellationToken);
           if (result)
           {
@@ -227,13 +230,19 @@ namespace EntrvoWebApp.Services
             {
               consumer.Lpn3 = (oldValue + newValue).ToString();
             }
+           
           }
           else
           {
             consumer.Lpn2 = "Term";
             consumer.Lpn3 = string.Empty;
           }
-
+          // if no end validity date, add 10 years from current time
+          if (!record.EndValidity.HasValue)
+          {
+            consumer.Identification.ValidUntil = DateTime.Today.AddYears(10).ToString("yyyy-MM-dd");
+            consumer.Consumer.ValidUntil = DateTime.Today.AddYears(10).ToString("yyyy-MM-dd");
+          }
           bool result = await _api.UpdateConsumerAsync(consumer, cancellationToken);
           if (result)
           {
