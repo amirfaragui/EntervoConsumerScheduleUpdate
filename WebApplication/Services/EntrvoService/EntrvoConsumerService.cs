@@ -112,6 +112,8 @@ namespace EntrvoWebApp.Services
           if (!string.IsNullOrWhiteSpace(record.Note1)) consumer.Memo = $"{record.Note1}-{record.Note1Extended}".TrimEnd('-');
           if (!string.IsNullOrWhiteSpace(record.Note2)) consumer.UserField1 = $"{record.Note2}-{record.LPN1}-{record.LPN2}";
           if (!string.IsNullOrWhiteSpace(record.Note3)) consumer.UserField2 = record.Note3;
+          consumer.IgnorePresence = 1;
+          consumer.Identification.IgnorePresence = 1;
 
           consumer.Identification.UsageProfile = profile!;
 
@@ -209,6 +211,8 @@ namespace EntrvoWebApp.Services
           if (!string.IsNullOrWhiteSpace(record.Note1)) consumer.Memo = $"{record.Note1}-{record.Note1Extended}".TrimEnd('-');
           if (!string.IsNullOrWhiteSpace(record.Note2)) consumer.UserField1 = record.Note2;
           if (!string.IsNullOrWhiteSpace(record.Note3)) consumer.UserField2 = record.Note3;
+          consumer.IgnorePresence = 1;
+          consumer.Identification.IgnorePresence = 1;
 
           consumer.Identification.UsageProfile = profile!;
 
