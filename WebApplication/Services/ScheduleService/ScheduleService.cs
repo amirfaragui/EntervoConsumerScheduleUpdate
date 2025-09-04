@@ -46,7 +46,8 @@ namespace Entrvo.Services
       {
         try
         {
-          ScheduleWorkProc(_cancellationTokenSource.Token);
+          //     ScheduleWorkProc(_cancellationTokenSource.Token);
+          _logger.LogInformation("Will not run the schedule service");
         }
         catch (Exception ex)
         {
@@ -58,7 +59,7 @@ namespace Entrvo.Services
       {
         try
         {
-          QueueWorkProc(_cancellationTokenSource.Token);
+   //       QueueWorkProc(_cancellationTokenSource.Token);
         }
         catch (Exception ex)
         {
