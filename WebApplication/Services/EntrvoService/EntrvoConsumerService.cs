@@ -83,7 +83,12 @@ namespace EntrvoWebApp.Services
           if (record.AccessProfile != null && record.AccessProfile.Contains("PPU"))
           {
             consumer.Lpn2 = "PPU";
-            consumer.Lpn3 = record.AdditionalValue;
+            if (string.IsNullOrEmpty( record.AdditionalValue))
+            {
+              consumer.Lpn3 = "0";
+            }
+            else
+              consumer.Lpn3 = record.AdditionalValue;
           }
           else
           {
