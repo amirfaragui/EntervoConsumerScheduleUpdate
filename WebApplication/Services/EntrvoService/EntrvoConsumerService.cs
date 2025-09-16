@@ -143,9 +143,12 @@ namespace EntrvoWebApp.Services
               {
                 consumer.Lpn3 = newValue.ToString();
               }
-              if (int.TryParse(consumer.Lpn3, out var oldValue))
+              else
               {
-                consumer.Lpn3 = (oldValue + newValue).ToString();
+                if (int.TryParse(consumer.Lpn3, out var oldValue))
+                {
+                  consumer.Lpn3 = (oldValue + newValue).ToString();
+                }
               }
             }
             
@@ -249,9 +252,12 @@ namespace EntrvoWebApp.Services
               {
                 consumer.Lpn3 = newValue.ToString();
               }
-              if (int.TryParse(consumer.Lpn3, out var oldValue))
+              else
               {
-                consumer.Lpn3 = (oldValue + newValue).ToString();
+                if (int.TryParse(consumer.Lpn3, out var oldValue))
+                {
+                  consumer.Lpn3 = (oldValue + newValue).ToString();
+                }
               }
             }
 
