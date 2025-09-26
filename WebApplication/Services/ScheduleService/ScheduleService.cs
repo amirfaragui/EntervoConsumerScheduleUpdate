@@ -46,8 +46,8 @@ namespace Entrvo.Services
       {
         try
         {
-          //     ScheduleWorkProc(_cancellationTokenSource.Token);
-          _logger.LogInformation("Will not run the schedule service");
+           ScheduleWorkProc(_cancellationTokenSource.Token);
+          //_logger.LogInformation("Will not run the schedule service");
         }
         catch (Exception ex)
         {
@@ -59,7 +59,7 @@ namespace Entrvo.Services
       {
         try
         {
-   //       QueueWorkProc(_cancellationTokenSource.Token);
+         QueueWorkProc(_cancellationTokenSource.Token);
         }
         catch (Exception ex)
         {
@@ -88,11 +88,19 @@ namespace Entrvo.Services
         //var minute = DateTime.Now.Subtract(DateTime.Today).TotalMinutes;
         //await Task.Delay(TimeSpan.FromMinutes(1440 - minute), token);
 
+        // run the job now then have a timer
+        await Task.Delay(1000);
+        await AddConsumersPushJob();
+
+        var now = DateTime.Now.TimeOfDay.TotalMinutes;
+        TimeSpan timeToUpload = TimeSpan.Parse(_scheduleOptions.DailyEntervoUpdateSchedule);
+        var delay = (1440 + timeToUpload.TotalMinutes - now) % 1440;
+        await Task.Delay(TimeSpan.FromMinutes(delay));
         while (true)
         {
           token.ThrowIfCancellationRequested();
 
-          var now = DateTime.Today;
+      /**    var now = DateTime.Today;
           var dayUntilMonthEnd = (int)now.CurrentMonthEnd().Subtract(now).TotalDays;
           var hour = DateTime.Now.Hour;
 
@@ -115,19 +123,19 @@ namespace Entrvo.Services
             {
               case 1:
                 await AddPayrollFileDownloadJob();
-                break;
+                break;  **/
 
-              case 3:
+          //    case 3:
                 await AddConsumersPushJob();
-                break;
+            //    break;
 
-              case 8:
-                await AddExport01ReportJOb();
-                break;
-            }
-          }
+              //case 8:
+              //  await AddExport01ReportJOb();
+               // break;
+           // }
+         // }
 
-          await Task.Delay(TimeSpan.FromHours(1), token);
+          await Task.Delay(TimeSpan.FromDays(1), token);
         }
       }
       catch (Exception ex)

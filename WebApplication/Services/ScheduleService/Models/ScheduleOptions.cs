@@ -4,5 +4,7 @@
   {
     public int DaysBeforeMonthEndFor1stReport { get; set; }
     public int DaysBeforeMonthEndFor2ndReport { get; set; }
+
+     public string DailyEntervoUpdateSchedule {  get; set; }
   }
 }
